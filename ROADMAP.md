@@ -3,12 +3,12 @@
 ## v0.1 — Foundation (Current)
 **Goal:** Ship the core spec + conformance suite, validate against 3 providers.
 
-- [ ] Messages spec (text-only)
-- [ ] Thinking/reasoning token spec
-- [ ] Streaming spec (SSE event format)
-- [ ] Usage reporting spec (input/output/thinking/cached tokens)
-- [ ] Model capabilities declaration spec
-- [ ] Error contract spec
+- [x] Messages spec (text-only)
+- [x] Thinking/reasoning token spec
+- [x] Streaming spec (SSE event format)
+- [x] Usage reporting spec (input/output/thinking/cached tokens)
+- [x] Model capabilities declaration spec
+- [x] Error contract spec
 - [ ] Conformance test suite (CLI runner)
 - [ ] Python reference SDK
 - [ ] Adapters: Groq, DeepSeek, Alibaba Qwen
