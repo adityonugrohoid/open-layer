@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openlayer.dev/schema/v0.1/chat-completion-chunk.json",
+  "title": "Chat Completion Chunk",
+  "description": "A single chunk in a streaming chat completion response.",
+  "type": "object",
+  "required": ["id", "object", "created", "model", "choices"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier for the completion. Same across all chunks in a stream."
+    },
+    "object": {
+      "type": "string",
+      "const": "chat.completion.chunk",
+      "description": "Object type. Always \"chat.completion.chunk\"."
+    },
+    "created": {
+      "type": "integer",
+      "description": "Unix timestamp (seconds) when the completion was created."
+    },
+    "model": {
+      "type": "string",
+      "description": "The model that generated the completion."
+    },
+    "choices": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/chunk_choice" },
+      "description": "Incremental choices. Empty array in the usage-only final chunk."
+    },
+    "usage": {
+      "$ref": "usage.json",
+      "description": "Token usage statistics. Present only in the final chunk when stream_options.include_usage is true."
+    }
+  },
+  "additionalProperties": true,
+  "$defs": {
+    "chunk_choice": {
+      "type": "object",
+      "required": ["index", "delta", "finish_reason"],
+      "properties": {
+        "index": {
+          "type": "integer",
+          "description": "Index of the choice."
+        },
+        "delta": {
+          "$ref": "#/$defs/delta",
+          "description": "Incremental content for this chunk."
+        },
+        "finish_reason": {
+          "description": "Null until the final chunk, then a finish reason string.",
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": ["stop", "length", "tool_calls"]
+            },
+            { "type": "null" }
+          ]
+        }
+      },
+      "additionalProperties": true
+    },
+    "delta": {
+      "type": "object",
+      "description": "Incremental content. All fields are optional — only changed fields are present.",
+      "properties": {
+        "role": {
+          "type": "string",
+          "enum": ["assistant"],
+          "description": "The role. Only present in the first chunk."
+        },
+        "content": {
+          "type": "string",
+          "description": "Incremental text content."
+        },
+        "thinking": {
+          "type": "object",
+          "properties": {
+            "content": {
+              "type": "string",
+              "description": "Incremental thinking text."
+            }
+          },
+          "additionalProperties": false,
+          "description": "Incremental thinking content (Level 2)."
+        }
+      },
+      "additionalProperties": true
+    }
+  }
+}

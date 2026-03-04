@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openlayer.dev/schema/v0.1/usage.json",
+  "title": "Usage",
+  "description": "Token usage statistics for a chat completion.",
+  "type": "object",
+  "required": ["prompt_tokens", "completion_tokens", "total_tokens"],
+  "properties": {
+    "prompt_tokens": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Number of tokens in the prompt (input)."
+    },
+    "completion_tokens": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Number of tokens in the completion (output). Includes reasoning tokens."
+    },
+    "total_tokens": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Sum of prompt_tokens and completion_tokens."
+    },
+    "prompt_tokens_details": {
+      "type": "object",
+      "properties": {
+        "cached_tokens": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of prompt tokens served from cache."
+        }
+      },
+      "additionalProperties": true,
+      "description": "Breakdown of prompt token usage."
+    },
+    "completion_tokens_details": {
+      "type": "object",
+      "properties": {
+        "reasoning_tokens": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of tokens used for thinking/reasoning."
+        }
+      },
+      "additionalProperties": true,
+      "description": "Breakdown of completion token usage."
+    }
+  },
+  "additionalProperties": true
+}

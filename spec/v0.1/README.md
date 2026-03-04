@@ -8,13 +8,13 @@ This directory contains the Open Layer v0.1 specification.
 
 | Section | File | Status |
 |---------|------|--------|
-| Messages | [`messages.md`](messages.md) | Planned |
-| Thinking/Reasoning | [`thinking.md`](thinking.md) | Planned |
-| Streaming | [`streaming.md`](streaming.md) | Planned |
-| Usage Reporting | [`usage.md`](usage.md) | Planned |
-| Model Capabilities | [`capabilities.md`](capabilities.md) | Planned |
-| Error Contract | [`errors.md`](errors.md) | Planned |
-| JSON Schemas | [`schema/`](schema/) | Planned |
+| Messages | [`messages.md`](messages.md) | Draft |
+| Thinking/Reasoning | [`thinking.md`](thinking.md) | Draft |
+| Streaming | [`streaming.md`](streaming.md) | Draft |
+| Usage Reporting | [`usage.md`](usage.md) | Draft |
+| Model Capabilities | [`capabilities.md`](capabilities.md) | Draft |
+| Error Contract | [`errors.md`](errors.md) | Draft |
+| JSON Schemas | [`schema/`](schema/) | Draft |
 
 ## Design Principles
 

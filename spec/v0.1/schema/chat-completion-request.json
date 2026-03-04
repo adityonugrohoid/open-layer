@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openlayer.dev/schema/v0.1/chat-completion-request.json",
+  "title": "Chat Completion Request",
+  "description": "Request body for POST /v1/chat/completions.",
+  "type": "object",
+  "required": ["model", "messages"],
+  "properties": {
+    "model": {
+      "type": "string",
+      "description": "Model identifier (provider-specific)."
+    },
+    "messages": {
+      "type": "array",
+      "items": { "$ref": "message.json" },
+      "minItems": 1,
+      "description": "Conversation history. Must contain at least one message."
+    },
+    "temperature": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 2.0,
+      "description": "Sampling temperature."
+    },
+    "top_p": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "description": "Nucleus sampling threshold."
+    },
+    "max_tokens": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Maximum tokens to generate in the completion."
+    },
+    "stop": {
+      "description": "Up to 4 sequences where the model stops generating.",
+      "oneOf": [
+        { "type": "string" },
+        {
+          "type": "array",
+          "items": { "type": "string" },
+          "maxItems": 4
+        },
+        { "type": "null" }
+      ]
+    },
+    "stream": {
+      "type": "boolean",
+      "default": false,
+      "description": "If true, response is streamed as SSE events."
+    },
+    "n": {
+      "type": "integer",
+      "minimum": 1,
+      "default": 1,
+      "description": "Number of completions to generate. Providers may restrict to 1."
+    },
+    "thinking": {
+      "$ref": "thinking.json#/$defs/thinking_request",
+      "description": "Thinking/reasoning parameters. See thinking.md."
+    },
+    "stream_options": {
+      "type": "object",
+      "properties": {
+        "include_usage": {
+          "type": "boolean",
+          "default": false,
+          "description": "If true, include usage statistics in the final streaming chunk."
+        }
+      },
+      "additionalProperties": false,
+      "description": "Options for streaming responses."
+    }
+  },
+  "additionalProperties": true
+}
