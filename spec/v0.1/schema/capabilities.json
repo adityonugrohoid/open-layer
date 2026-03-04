@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openlayer.dev/schema/v0.1/capabilities.json",
+  "title": "Capabilities",
+  "description": "Response body for GET /v1/capabilities — feature discovery endpoint.",
+  "type": "object",
+  "required": ["spec_version", "conformance_level", "features"],
+  "properties": {
+    "spec_version": {
+      "type": "string",
+      "description": "The Open Layer spec version. Format: \"0.1-draft\" for pre-1.0, \"YYYY-MM-DD\" at 1.0+."
+    },
+    "conformance_level": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 3,
+      "description": "Highest conformance level supported. 1=Core, 2=Thinking, 3=Agentic."
+    },
+    "features": {
+      "$ref": "#/$defs/features",
+      "description": "Provider-wide feature support. Per-model overrides take precedence."
+    },
+    "models": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/model" },
+      "description": "Available models with per-model feature overrides."
+    }
+  },
+  "additionalProperties": true,
+  "$defs": {
+    "features": {
+      "type": "object",
+      "description": "Feature support declarations.",
+      "properties": {
+        "thinking": {
+          "type": "object",
+          "properties": {
+            "supported": {
+              "type": "boolean",
+              "description": "Whether thinking tokens are supported."
+            },
+            "budget_control": {
+              "type": "boolean",
+              "default": false,
+              "description": "Whether budget_tokens is respected."
+            }
+          },
+          "required": ["supported"],
+          "additionalProperties": true
+        },
+        "streaming": {
+          "type": "object",
+          "properties": {
+            "supported": {
+              "type": "boolean",
+              "description": "Whether streaming is supported."
+            },
+            "usage_in_stream": {
+              "type": "boolean",
+              "default": false,
+              "description": "Whether stream_options.include_usage is supported."
+            }
+          },
+          "required": ["supported"],
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": true
+    },
+    "model": {
+      "type": "object",
+      "required": ["id"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Model identifier."
+        },
+        "features": {
+          "$ref": "#/$defs/features",
+          "description": "Per-model feature overrides."
+        }
+      },
+      "additionalProperties": true
+    }
+  }
+}

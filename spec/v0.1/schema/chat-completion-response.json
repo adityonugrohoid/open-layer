@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openlayer.dev/schema/v0.1/chat-completion-response.json",
+  "title": "Chat Completion Response",
+  "description": "Response body for a non-streaming chat completion.",
+  "type": "object",
+  "required": ["id", "object", "created", "model", "choices", "usage"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier for the completion."
+    },
+    "object": {
+      "type": "string",
+      "const": "chat.completion",
+      "description": "Object type. Always \"chat.completion\"."
+    },
+    "created": {
+      "type": "integer",
+      "description": "Unix timestamp (seconds) when the completion was created."
+    },
+    "model": {
+      "type": "string",
+      "description": "The model that generated the completion."
+    },
+    "choices": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/choice" },
+      "description": "List of completion choices."
+    },
+    "usage": {
+      "$ref": "usage.json",
+      "description": "Token usage statistics."
+    }
+  },
+  "additionalProperties": true,
+  "$defs": {
+    "choice": {
+      "type": "object",
+      "required": ["index", "message", "finish_reason"],
+      "properties": {
+        "index": {
+          "type": "integer",
+          "description": "Index of the choice in the choices array."
+        },
+        "message": {
+          "$ref": "message.json",
+          "description": "The generated message. Role is always \"assistant\"."
+        },
+        "finish_reason": {
+          "type": "string",
+          "enum": ["stop", "length", "tool_calls"],
+          "description": "Why the model stopped generating."
+        }
+      },
+      "additionalProperties": true
+    }
+  }
+}

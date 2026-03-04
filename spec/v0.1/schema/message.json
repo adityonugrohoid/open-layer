@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openlayer.dev/schema/v0.1/message.json",
+  "title": "Message",
+  "description": "A single message in a chat conversation.",
+  "type": "object",
+  "required": ["role", "content"],
+  "properties": {
+    "role": {
+      "type": "string",
+      "enum": ["system", "user", "assistant", "tool"],
+      "description": "The role of the message author."
+    },
+    "content": {
+      "description": "The text content of the message.",
+      "oneOf": [
+        { "type": "string" },
+        { "type": "null" }
+      ]
+    },
+    "name": {
+      "type": "string",
+      "description": "An optional name for the participant."
+    },
+    "thinking": {
+      "$ref": "thinking.json#/$defs/thinking_response",
+      "description": "Thinking/reasoning content. Only present on assistant messages. See thinking.md."
+    }
+  },
+  "additionalProperties": true
+}

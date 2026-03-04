@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openlayer.dev/schema/v0.1/error.json",
+  "title": "Error",
+  "description": "Standard error response format.",
+  "type": "object",
+  "required": ["error"],
+  "properties": {
+    "error": {
+      "type": "object",
+      "required": ["type", "message"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "invalid_request_error",
+            "authentication_error",
+            "permission_error",
+            "not_found_error",
+            "rate_limit_error",
+            "server_error",
+            "overloaded_error"
+          ],
+          "description": "Error category."
+        },
+        "message": {
+          "type": "string",
+          "description": "Human-readable error description."
+        },
+        "code": {
+          "type": "string",
+          "description": "Machine-readable error code for programmatic handling."
+        },
+        "param": {
+          "type": "string",
+          "description": "The request parameter that caused the error."
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}
