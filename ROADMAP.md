@@ -1,7 +1,7 @@
 # Open Layer — Roadmap
 
-## v0.1 — Foundation (Current)
-**Goal:** Ship the core spec + conformance suite, validate against 3 providers.
+## v0.1 — Foundation (Complete)
+**Goal:** Ship the core spec + conformance suite, validate against real providers.
 
 - [x] Messages spec (text-only)
 - [x] Thinking/reasoning token spec
@@ -9,26 +9,25 @@
 - [x] Usage reporting spec (input/output/thinking/cached tokens)
 - [x] Model capabilities declaration spec
 - [x] Error contract spec
-- [ ] Conformance test suite (CLI runner)
-- [ ] Python reference SDK
-- [ ] Adapters: Groq, DeepSeek, Nvidia
+- [x] Conformance test suite (66 tests/model, 30-model registry, CLI runner)
+- [x] Python reference SDK (async client, typed dataclasses, adapter protocol)
+- [x] Adapters: Nvidia (3 thinking patterns), DeepSeek, Groq
+- [x] A/B conformance report (HTML, 12 models tested)
 
-## v0.2 — Agentic
-- [ ] Tool calling spec
-- [ ] Structured output spec
-- [ ] Cache control hints spec
-- [ ] TypeScript SDK
-- [ ] Adapters: Mistral, Cerebras, Together.ai
-- [ ] Governance model (GOVERNANCE.md)
-- [ ] Docs site (GitHub Pages)
+**Outcome:** Proved that provider APIs diverge significantly beyond basic chat, and that adapter-based normalization is feasible. 12/12 models PASS through adapters.
 
-## v0.3 — Multimodal
-- [ ] Multimodal input spec (image, audio, video)
-- [ ] Multimodal output spec (image generation)
-- [ ] Embedding spec
-- [ ] Provider conformance dashboard (auto-updated via CI)
+---
 
-## Future
-- [ ] Propose to Linux Foundation / Agentic AI Foundation
-- [ ] Community RFC process for spec changes
-- [ ] Official provider certification program
+*v0.1 PoC is the final delivered version. The areas below remain as reference for what a full standard would require.*
+
+## v0.2 — Agentic (Not started)
+- Tool calling spec
+- Structured output spec
+- Cache control hints spec
+- TypeScript SDK
+- Additional adapters (Mistral, Cerebras, Together.ai)
+
+## v0.3 — Multimodal (Not started)
+- Multimodal input/output spec
+- Embedding spec
+- Provider conformance dashboard

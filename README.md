@@ -3,189 +3,155 @@
 # Open Layer
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
-[![Spec Version](https://img.shields.io/badge/spec-v0.1--draft-orange.svg)](spec/)
+[![Spec Version](https://img.shields.io/badge/spec-v0.1--PoC-orange.svg)](spec/)
+[![Status](https://img.shields.io/badge/status-v0.1%20PoC%20complete-green.svg)]()
 
-**A universal open standard for LLM inference I/O — standardizing how applications talk to language models.**
+**A proof-of-concept specification for standardizing LLM inference I/O across providers.**
 
-[Why Open Layer?](#why) | [The Spec](#the-specification) | [Conformance Tests](#conformance-tests) | [SDK](#reference-sdk) | [Roadmap](#roadmap)
+[Motivation](#motivation) | [What Was Explored](#what-was-explored) | [Key Findings](#key-findings) | [A/B Demo](#ab-demo) | [SDK](#reference-sdk)
 
 </div>
 
 ---
 
-## Why?
+## Motivation
 
-MCP standardized how models talk to **tools**. Nothing standardizes how apps talk to **models**.
+Every open model provider claims "OpenAI-compatible" APIs, but conformance breaks down beyond basic chat completions. This project explored what a formal standard would look like by:
 
-Every open model provider claims "OpenAI-compatible" — but only for the basics. The moment you use thinking tokens, streaming, tool calling, or caching, everything diverges:
+1. **Writing a spec** — defining the canonical request/response contract for messages, thinking tokens, streaming, usage reporting, errors, and capabilities
+2. **Testing it** — running conformance tests against 12 models across 10 families on Nvidia NIM
+3. **Building adapters** — normalizing non-conformant responses to prove the spec works in practice
 
-| Feature | Provider A | Provider B | Provider C |
-|---------|-----------|-----------|-----------|
-| Thinking tokens | `reasoning_content` | `thinking_blocks` | `thinkingConfig` |
-| Streaming deltas | `choices[0].delta` | `content_block_delta` | `candidates[0].content` |
-| Cache reporting | `usage.cache_hit_tokens` | not reported | `cachedContentTokenCount` |
-| Tool schemas | OpenAI-style | similar but different | `functionDeclarations` |
+### The Fragmentation Problem
 
-**Open Layer** is a spec — not a proxy, not a library — that defines the canonical request/response contract for LLM inference. Providers conform natively. Apps code to it once.
+| Feature | Nvidia NIM | DeepSeek | Groq |
+|---------|-----------|----------|------|
+| Thinking tokens | `<think>` tags in content | `reasoning_content` field | `reasoning` field |
+| Null usage fields | `prompt_tokens_details: null` | omitted | omitted |
+| Non-spec fields | 8+ per response (`logprobs`, `stop_reason`, `service_tier`...) | 2-3 | 1-2 |
 
-```
-Without Open Layer:  [App] -> [LiteLLM/OpenRouter translates] -> [Provider]
-With Open Layer:     [App] -> [Provider speaks the spec natively]
-```
+## What Was Explored
 
-## The Specification
+### Specification (`spec/v0.1/`)
 
-The spec defines a standard contract for:
+Markdown prose + JSON Schema definitions covering 6 areas:
 
 | Section | What It Standardizes |
 |---------|---------------------|
 | **Messages** | Roles, content format, multi-turn structure |
 | **Thinking** | Budget control, visibility, response format for reasoning tokens |
 | **Streaming** | SSE event types, delta shapes, chunk boundaries |
-| **Usage Reporting** | `{prompt_tokens, completion_tokens, reasoning_tokens, cached_tokens}` |
-| **Model Capabilities** | `GET /v1/capabilities` endpoint |
+| **Usage** | `{prompt_tokens, completion_tokens, reasoning_tokens, cached_tokens}` |
+| **Capabilities** | `GET /v1/capabilities` endpoint |
 | **Errors** | Standard error types, retry semantics, rate limit headers |
 
-**Spec format:** Markdown prose + JSON Schema definitions, versioned in git.
+### Conformance Tests (`tests/`)
 
-See [`spec/v0.1/`](spec/v0.1/) for the full specification.
-
-## Conformance Tests
-
-A model-agnostic test harness that validates any OpenAI-compatible endpoint against the spec. Currently tests 30 models on Nvidia NIM across 10 model families.
+66 tests per model, 30-model registry with tag-based parameterization:
 
 ```bash
 cd tests && source ../.venv/bin/activate
-
-# Default: smoke subset (5 diverse models)
-python -m pytest suite/ -v
-
-# Single model
-python -m pytest suite/ -v --model llama-3.3-70b
-
-# Thinking models only
-python -m pytest suite/ -v --tag thinking
-
-# All 30 models
-python -m pytest suite/ -v --all
+python -m pytest suite/ -v              # smoke (5 models)
+python -m pytest suite/ -v --tag thinking  # thinking models only
+python -m pytest suite/ -v --all        # all 30 models
 ```
 
-### Conformance Results (2026-03-05)
+### Provider Adapters (`adapters/`)
 
-Tested 12 models across 10 families on Nvidia NIM:
+| Adapter | Thinking Translation | Usage Normalization |
+|---------|---------------------|-------------------|
+| `NvidiaAdapter` | `<think>` tags + `reasoning_content` -> `message.thinking` | null cleanup, `reasoning_tokens` relocation |
+| `DeepSeekAdapter` | `reasoning_content` -> `message.thinking` | passthrough |
+| `GroqAdapter` | `reasoning` -> `message.thinking` | `budget_tokens` -> `reasoning_effort` |
 
-| Model | Family | L1 Core | L2 Thinking | Non-conformances |
-|-------|--------|---------|-------------|------------------|
-| llama-3.3-70b-instruct | Llama | PASS | N/A | - |
-| gemma-3-27b-it | Gemma | PASS | N/A | - |
-| mistral-small-3.1-24b | Mistral | PASS | N/A | - |
-| deepseek-r1-distill-qwen-14b | DeepSeek | PASS | partial | rejects unknown fields, usage chunk has choices |
-| phi-4-mini-flash-reasoning | Phi | partial | partial | finish_reason=length on short prompts |
-| nemotron-ultra-253b-v1 | Nemotron | partial | N/A | content=null on max_tokens |
-| nemotron-mini-4b-instruct | Nemotron | partial | N/A | rejects unknown fields, usage chunk has choices |
-| qwen2.5-coder-32b | Qwen | partial | N/A | rejects unknown fields, usage chunk has choices |
-| deepseek-r1-distill-llama-8b | DeepSeek | partial | partial | rejects unknown fields, usage chunk has choices |
-| solar-10.7b-instruct | Solar | partial | N/A | usage chunk has choices |
-| jamba-1.5-mini-instruct | Jamba | PASS | N/A | - |
-| chatglm3-6b | GLM | PASS | N/A | - |
+### A/B Demo (`scripts/`, `docs/`)
 
-**Key findings:**
-- `test_unknown_fields_accepted` — 4/12 models reject unknown request fields (API gateway behavior)
-- `test_usage_chunk_has_empty_choices` — 5/12 models include non-empty choices in usage chunk
-- Thinking models use `<think>` tags in content instead of `message.thinking.content`
-- Nvidia returns plain text (not JSON) for invalid model errors
+Visual proof of what adapters fix — HTML report with side-by-side raw vs normalized JSON, diff-highlighted per model.
 
-**Conformance levels:**
-- **Level 1: Core** — Messages, streaming, usage reporting, errors
-- **Level 2: Thinking** — Level 1 + reasoning/thinking token support
-- **Level 3: Agentic** — Level 2 + tool calling, structured output, caching (v0.2)
+```bash
+# Terminal demo (single model)
+python scripts/ab_demo.py
+
+# Full HTML report (all 12 models)
+python scripts/ab_report.py
+# Then open docs/ab-report.html
+```
+
+## Key Findings
+
+Tested 12 models across 10 families on Nvidia NIM (2026-03-05):
+
+| Finding | Impact |
+|---------|--------|
+| 4/12 models reject unknown request fields | API gateway behavior, not model-level |
+| 5/12 models include non-empty choices in streaming usage chunk | Breaks clients expecting empty choices on usage-only chunks |
+| Thinking models use 3 different patterns for reasoning output | No interoperability without adapters |
+| Nvidia returns plain text (not JSON) for invalid model errors | Breaks typed error handling |
+| **12/12 models PASS after adapter normalization** | Adapters work as a bridge |
+
+### Conformance Results
+
+| Model | Core | Thinking | Notes |
+|-------|------|----------|-------|
+| llama-3.3-70b-instruct | PASS | N/A | - |
+| gemma-3-27b-it | PASS | N/A | - |
+| mistral-small-3.1-24b | PASS | N/A | - |
+| deepseek-r1-distill-qwen-14b | PASS | PASS | `<think>` tags extracted |
+| phi-4-mini-flash-reasoning | PASS | PASS | `<think>` tags extracted |
+| nemotron-ultra-253b-v1 | PASS | PASS | `reasoning_content` extracted |
+| nemotron-mini-4b-instruct | PASS | N/A | - |
+| qwen2.5-coder-32b | PASS | N/A | - |
+| deepseek-r1-distill-llama-8b | PASS | PASS | `<think>` tags extracted |
+| solar-10.7b-instruct | PASS | N/A | - |
+| jamba-1.5-mini-instruct | PASS | N/A | - |
+| chatglm3-6b | PASS | N/A | - |
 
 ## Reference SDK
 
-Python SDK with typed dataclasses and provider adapters.
-
 ```python
-import asyncio
 from open_layer import OpenLayerClient, ChatCompletionRequest, Message
 from adapters.nvidia import NvidiaAdapter
 
-async def main():
-    async with OpenLayerClient(
-        base_url="https://integrate.api.nvidia.com/v1",
-        api_key="...",
-        adapter=NvidiaAdapter(),
-    ) as client:
-        # Non-streaming
-        response = await client.chat(ChatCompletionRequest(
-            model="meta/llama-3.3-70b-instruct",
-            messages=[Message(role="user", content="Explain quantum computing")],
-            max_tokens=100,
-        ))
-        print(response.choices[0].message.content)
-
-        # Streaming
-        request = ChatCompletionRequest(
-            model="meta/llama-3.3-70b-instruct",
-            messages=[Message(role="user", content="Say hi")],
-            max_tokens=10,
-            stream=True,
-        )
-        async for chunk in client.stream(request):
-            for choice in chunk.choices:
-                if choice.delta.content:
-                    print(choice.delta.content, end="")
-
-asyncio.run(main())
+async with OpenLayerClient(
+    base_url="https://integrate.api.nvidia.com/v1",
+    api_key="...",
+    adapter=NvidiaAdapter(),
+) as client:
+    response = await client.chat(ChatCompletionRequest(
+        model="deepseek-ai/deepseek-r1-distill-llama-8b",
+        messages=[Message(role="user", content="Explain quantum computing")],
+    ))
+    # Thinking extracted into message.thinking.content
+    # Content is clean answer only
+    print(response.choices[0].message.content)
+    print(response.choices[0].message.thinking.content)
 ```
-
-### Adapters
-
-Adapters translate between provider-native APIs and the Open Layer spec:
-
-| Adapter | Provider | Thinking Translation | Usage Normalization |
-|---------|----------|---------------------|-------------------|
-| `NvidiaAdapter` | Nvidia NIM | `<think>` tags -> `message.thinking` | top-level `reasoning_tokens` -> `completion_tokens_details` |
-| `DeepSeekAdapter` | DeepSeek | `reasoning_content` -> `message.thinking` | passthrough |
-| `GroqAdapter` | Groq | `reasoning` -> `message.thinking` | `budget_tokens` -> `reasoning_effort` |
 
 ## Project Structure
 
 ```
 open-layer/
-├── spec/v0.1/              # The specification (Markdown + JSON Schema)
-├── tests/                   # Conformance test suite
-│   ├── suite/               #   Test cases (66 tests per model)
-│   ├── models.py            #   30-model registry with tag system
-│   ├── results/             #   Saved conformance test outputs
-│   └── runner/              #   CLI test runner
-├── sdks/python/             # Python SDK (open_layer)
-│   └── open_layer/          #   Client, types, adapter protocol
-├── adapters/                # Provider-specific adapters
-│   ├── nvidia/              #   Nvidia NIM
-│   ├── deepseek/            #   DeepSeek
-│   └── groq/                #   Groq
-├── scripts/                 # Validation and utility scripts
-└── docs/                    # Provider fragmentation research
+├── spec/v0.1/              # Specification (Markdown + JSON Schema)
+├── tests/                   # Conformance test suite (66 tests/model)
+│   ├── suite/               #   Test cases
+│   ├── models.py            #   30-model registry
+│   └── results/             #   Saved outputs
+├── sdks/python/open_layer/  # Python SDK (async client, typed dataclasses)
+├── adapters/                # Provider adapters (Nvidia, DeepSeek, Groq)
+├── scripts/
+│   ├── ab_demo.py           #   Terminal A/B demo (rich)
+│   ├── ab_report.py         #   HTML report generator
+│   └── validate_sdk.py      #   SDK validation across 12 models
+└── docs/
+    ├── ab-report.html       #   Generated conformance report
+    └── provider-fragmentation.md
 ```
 
-## Roadmap
+## Status
 
-- [x] **v0.1 Spec** — Messages, thinking tokens, streaming, usage reporting, errors, capabilities
-- [x] **Conformance tests** — 66 tests, 30 models, 10 families, CLI runner with --model/--tag/--all
-- [x] **Python SDK** — Async client with typed dataclasses and adapter protocol
-- [x] **Adapters** — Nvidia, DeepSeek, Groq
-- [ ] **v0.2** — Tool calling, structured output, caching
-- [ ] **TypeScript SDK** — `@open-layer/sdk` (npm)
-- [ ] **v0.3** — Multimodal input, governance model
+**v0.1 PoC — Complete.** This project explored LLM API standardization as a proof of concept. The spec, conformance tests, SDK, and adapters demonstrate the problem space and validate that normalization is feasible.
 
-## How It Differs
-
-| | Open Layer | LiteLLM | OpenRouter | OpenAI Compat |
-|---|---|---|---|---|
-| **Type** | Spec (document) | Library (code) | Service (cloud) | Informal convention |
-| **Translation** | None — providers conform | Runtime proxy | Cloud proxy | Each provider interprets |
-| **Thinking tokens** | First-class standard | Runtime normalization | Runtime normalization | Not covered |
-| **Lock-in** | None | LiteLLM abstractions | OpenRouter routing | OpenAI's changelog |
+Not actively developed beyond v0.1. The conformance report and adapter patterns serve as reference material for understanding provider fragmentation in the LLM API ecosystem.
 
 ## License
 
@@ -194,3 +160,4 @@ open-layer/
 ## Author
 
 **Adityo Nugroho** ([@adityonugrohoid](https://github.com/adityonugrohoid))
+</div>
