@@ -1,8 +1,10 @@
 """Nvidia NIM adapter — translates between Open Layer spec and Nvidia API.
 
 Key deviations handled:
-- Thinking: Nvidia R1-distill models use <think>...</think> tags in content,
-  not a separate message.thinking.content field. This adapter extracts them.
+- Thinking (tag-based): R1-distill models use <think>...</think> tags in content.
+  This adapter extracts them into message.thinking.content.
+- Thinking (field-based): Nemotron-ultra uses message.reasoning_content instead.
+  This adapter moves it to message.thinking.content and removes the non-spec field.
 - Usage: Nvidia puts reasoning_tokens at top-level usage (not in completion_tokens_details).
 - prompt_tokens_details: Often null instead of omitted.
 - No thinking request param: Nvidia models think inherently, no {thinking: {enabled: true}}.
@@ -60,6 +62,13 @@ class NvidiaAdapter:
             usage.pop("completion_tokens_details", None)
 
     def _extract_thinking(self, msg: dict[str, Any]) -> None:
+        # Strategy 1: reasoning_content field (nemotron-ultra style)
+        reasoning_content = msg.pop("reasoning_content", None)
+        if reasoning_content and isinstance(reasoning_content, str):
+            msg["thinking"] = {"content": reasoning_content.strip()}
+            return
+
+        # Strategy 2: <think> tags in content (R1-distill style)
         content = msg.get("content")
         if not content or not isinstance(content, str):
             return
@@ -67,7 +76,6 @@ class NvidiaAdapter:
         match = THINK_TAG_RE.search(content)
         if match:
             thinking_text = match.group(1).strip()
-            # Remove <think> tags from content
             clean_content = THINK_TAG_RE.sub("", content).strip()
             msg["content"] = clean_content
             msg["thinking"] = {"content": thinking_text}
