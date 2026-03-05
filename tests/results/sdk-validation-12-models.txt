@@ -1,0 +1,14 @@
+Model                                              Chat       Stream     Thinking                      
+----------------------------------------------------------------------------------------------------
+llama-3.3-70b-instruct                             PASS       PASS       N/A                           
+gemma-3-27b-it                                     PASS       PASS       N/A                           
+mistral-small-3.1-24b-instruct-2503                PASS       PASS       N/A                           
+deepseek-r1-distill-qwen-14b                       PASS       PASS       PASS (extracted)              
+phi-4-mini-flash-reasoning                         PASS       PASS       PASS (extracted)              
+llama-3.1-nemotron-ultra-253b-v1                   PASS       PASS       N/A                           
+nemotron-mini-4b-instruct                          PASS       PASS       N/A                           
+qwen2.5-coder-32b-instruct                         PASS       PASS       N/A                           
+deepseek-r1-distill-llama-8b                       PASS       PASS       PASS (extracted)              
+solar-10.7b-instruct                               PASS       PASS       N/A                           
+jamba-1.5-mini-instruct                            PASS       PASS       N/A                           
+chatglm3-6b                                        PASS       PASS       N/A                           
