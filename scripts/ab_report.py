@@ -75,7 +75,7 @@ async def call_model(client: httpx.AsyncClient, model: str) -> dict:
         json={
             "model": model,
             "messages": [{"role": "user", "content": PROMPT}],
-            "max_tokens": 1024,
+            "max_tokens": 2048,
         },
     )
     resp.raise_for_status()
