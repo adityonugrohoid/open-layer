@@ -33,6 +33,7 @@ open-layer/
 │   ├── deepseek/            #   reasoning_content mapping, input stripping
 │   └── groq/                #   reasoning field mapping, budget→effort
 ├── scripts/
+│   ├── ab_demo.py            #   A/B demo: raw API vs adapter-normalized output
 │   └── validate_sdk.py      #   SDK+adapter validation against 12 models
 └── docs/
     └── provider-fragmentation.md
@@ -59,6 +60,9 @@ cd tests && python -m pytest suite/ -v --all              # all 30 models
 # SDK validation
 python scripts/validate_sdk.py
 
+# A/B demo (raw vs adapter-normalized)
+python scripts/ab_demo.py
+
 # Validate JSON schemas
 python3 -c "import json, glob; [print(f'OK: {f}') for f in sorted(glob.glob('spec/v0.1/schema/*.json')) if json.load(open(f))]"
 ```
@@ -76,3 +80,9 @@ python3 -c "import json, glob; [print(f'OK: {f}') for f in sorted(glob.glob('spe
 - 35 RPM throttle for Nvidia free tier (asyncio.Lock in throttle.py)
 - xfail for known provider deviations (tests stay spec-correct)
 - ModelConfig with tag-based parameterization (not provider-based)
+
+## A/B Demo
+- `scripts/ab_demo.py` — rich-powered side-by-side comparison of raw Nvidia API vs adapter-normalized output
+- Shows: thinking extraction (<think> tags → message.thinking.content), usage normalization, non-spec field detection
+- Tries deepseek-r1-distill-qwen-14b first, falls back to deepseek-r1-distill-llama-8b
+- Run: `python scripts/ab_demo.py`
