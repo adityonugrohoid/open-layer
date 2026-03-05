@@ -1,0 +1,1860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Open Layer v0.1 — Adapter Conformance Report</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-dim: #8b949e;
+    --red: #f85149;
+    --red-bg: rgba(248,81,73,0.15);
+    --green: #3fb950;
+    --green-bg: rgba(63,185,80,0.15);
+    --orange: #d29922;
+    --orange-bg: rgba(210,153,34,0.15);
+    --purple: #bc8cff;
+    --blue: #58a6ff;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+  }
+
+  .container { max-width: 1400px; margin: 0 auto; padding: 24px; }
+
+  header {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 24px;
+    margin-bottom: 32px;
+  }
+  header h1 {
+    font-size: 28px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  header p { color: var(--text-dim); font-size: 14px; }
+
+  /* Stats row */
+  .stats {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 24px;
+    flex: 1;
+    min-width: 140px;
+  }
+  .stat-card .stat-value {
+    font-size: 32px;
+    font-weight: 700;
+  }
+  .stat-card .stat-label {
+    font-size: 12px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .stat-card.green .stat-value { color: var(--green); }
+  .stat-card.red .stat-value { color: var(--red); }
+  .stat-card.orange .stat-value { color: var(--orange); }
+  .stat-card.purple .stat-value { color: var(--purple); }
+
+  /* Summary table */
+  .summary-section { margin-bottom: 40px; }
+  .summary-section h2 {
+    font-size: 20px;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--surface);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  th, td {
+    padding: 10px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+  th {
+    background: rgba(255,255,255,0.05);
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-dim);
+  }
+  td a { color: var(--blue); text-decoration: none; }
+  td a:hover { text-decoration: underline; }
+  .summary-error td { opacity: 0.5; }
+
+  /* Badges */
+  .badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 10px;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    vertical-align: middle;
+  }
+  .status-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 10px;
+    border-radius: 10px;
+  }
+  .status-badge.ok { background: rgba(63,185,80,0.2); color: var(--green); }
+  .status-badge.error { background: rgba(248,81,73,0.2); color: var(--red); }
+  .count-badge {
+    display: inline-block;
+    font-size: 11px;
+    padding: 2px 10px;
+    border-radius: 10px;
+    margin-left: 6px;
+  }
+  .count-badge.fixed { background: rgba(63,185,80,0.2); color: var(--green); }
+  .count-badge.extra { background: rgba(139,148,158,0.2); color: var(--text-dim); }
+
+  /* Model cards */
+  .model-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+  .model-card.error {
+    opacity: 0.6;
+  }
+  .model-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .model-header h3 {
+    font-size: 16px;
+    font-weight: 600;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+  }
+  .header-badges { display: flex; align-items: center; }
+  .error-msg {
+    padding: 16px 20px;
+    color: var(--red);
+    font-family: monospace;
+    font-size: 13px;
+  }
+
+  /* Deviations */
+  .deviations {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .deviations h4 {
+    font-size: 13px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 10px;
+  }
+  .dev-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 0;
+    font-size: 13px;
+  }
+  .dev-label { flex: 0 0 auto; min-width: 280px; }
+  .dev-arrow { color: var(--text-dim); flex: 0 0 20px; text-align: center; }
+  .dev-fix { color: var(--text-dim); }
+  .dev-item.fix-applied .dev-fix { color: var(--green); }
+
+  /* Side-by-side panels */
+  .panels {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+  }
+  .panel {
+    overflow-x: auto;
+  }
+  .panel-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .panel.raw .panel-label {
+    color: var(--red);
+    background: var(--red-bg);
+  }
+  .panel.normalized .panel-label {
+    color: var(--green);
+    background: var(--green-bg);
+  }
+  .panel.raw {
+    border-right: 1px solid var(--border);
+  }
+  .panel pre {
+    margin: 0;
+    padding: 16px;
+    font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+    font-size: 12px;
+    line-height: 1.6;
+    overflow-x: auto;
+    white-space: pre;
+  }
+  .panel pre code {
+    font-family: inherit;
+  }
+
+  /* JSON syntax */
+  .json-key { color: var(--blue); }
+  .json-str { color: #a5d6ff; }
+  .json-num { color: #79c0ff; }
+  .json-null { color: var(--text-dim); font-style: italic; }
+  .json-bool { color: var(--orange); }
+
+  /* Diff highlights */
+  .hl-removed {
+    background: var(--red-bg);
+    border-left: 3px solid var(--red);
+    padding-left: 4px;
+    display: inline;
+  }
+  .hl-added {
+    background: var(--green-bg);
+    border-left: 3px solid var(--green);
+    padding-left: 4px;
+    display: inline;
+  }
+  .hl-extra {
+    background: rgba(139,148,158,0.1);
+    border-left: 3px solid var(--text-dim);
+    padding-left: 4px;
+    display: inline;
+  }
+
+  /* Footer */
+  footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    color: var(--text-dim);
+    font-size: 13px;
+    text-align: center;
+  }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .panels { grid-template-columns: 1fr; }
+    .panel.raw { border-right: none; border-bottom: 1px solid var(--border); }
+    .dev-item { flex-wrap: wrap; }
+    .dev-label { min-width: auto; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>Open Layer v0.1 &mdash; Adapter Conformance Report</h1>
+  <p>
+    Raw Nvidia NIM API responses vs. NvidiaAdapter-normalized output &middot;
+    12 models &middot; Generated 2026-03-05 16:10 UTC
+  </p>
+  <p>Prompt: <code>What is 25 * 37? Think step by step.</code></p>
+</header>
+
+<div class="stats">
+  <div class="stat-card green">
+    <div class="stat-value">11</div>
+    <div class="stat-label">Models OK</div>
+  </div>
+  <div class="stat-card red">
+    <div class="stat-value">1</div>
+    <div class="stat-label">Errors</div>
+  </div>
+  <div class="stat-card orange">
+    <div class="stat-value">10</div>
+    <div class="stat-label">Deviations Fixed</div>
+  </div>
+  <div class="stat-card purple">
+    <div class="stat-value">88</div>
+    <div class="stat-label">Extra Fields Detected</div>
+  </div>
+</div>
+
+<div class="summary-section">
+  <h2>Summary</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Model</th>
+        <th>Status</th>
+        <th>Fixed</th>
+        <th>Extra Fields</th>
+        <th>Deviation Types</th>
+      </tr>
+    </thead>
+    <tbody>
+      
+            <tr>
+              <td><a href="#llama-3.3-70b-instruct">llama-3.3-70b-instruct</a></td>
+              <td><span class="status-badge ok">OK</span></td>
+              <td>1</td>
+              <td>14</td>
+              <td>null cleanup</td>
+            </tr>
+            <tr>
+              <td><a href="#gemma-3-27b-it">gemma-3-27b-it</a></td>
+              <td><span class="status-badge ok">OK</span></td>
+              <td>1</td>
+              <td>11</td>
+              <td>null cleanup</td>
+            </tr>
+            <tr>
+              <td><a href="#mistral-small-3.1-24b-instruct-2503">mistral-small-3.1-24b-instruct-2503</a></td>
+              <td><span class="status-badge ok">OK</span></td>
+              <td>1</td>
+              <td>4</td>
+              <td>null cleanup</td>
+            </tr>
+            <tr class="summary-error">
+              <td>deepseek-r1-distill-qwen-14b</td>
+              <td><span class="status-badge error">ERROR</span></td>
+              <td>-</td><td>-</td><td>-</td>
+            </tr>
+            <tr>
+              <td><a href="#phi-4-mini-flash-reasoning">phi-4-mini-flash-reasoning</a></td>
+              <td><span class="status-badge ok">OK</span></td>
+              <td>2</td>
+              <td>11</td>
+              <td>null cleanup, thinking</td>
+            </tr>
+            <tr>
+              <td><a href="#llama-3.1-nemotron-ultra-253b-v1">llama-3.1-nemotron-ultra-253b-v1</a></td>
+              <td><span class="status-badge ok">OK</span></td>
+              <td>2</td>
+              <td>13</td>
+              <td>null cleanup, thinking</td>
+            </tr>
+            <tr>
+              <td><a href="#nemotron-mini-4b-instruct">nemotron-mini-4b-instruct</a></td>
+              <td><span class="status-badge ok">OK</span></td>
+              <td>0</td>
+              <td>2</td>
+              <td>-</td>
+            </tr>
+            <tr>
+              <td><a href="#qwen2.5-coder-32b-instruct">qwen2.5-coder-32b-instruct</a></td>
+              <td><span class="status-badge ok">OK</span></td>
+              <td>0</td>
+              <td>3</td>
+              <td>-</td>
+            </tr>
+            <tr>
+              <td><a href="#deepseek-r1-distill-llama-8b">deepseek-r1-distill-llama-8b</a></td>
+              <td><span class="status-badge ok">OK</span></td>
+              <td>1</td>
+              <td>3</td>
+              <td>thinking</td>
+            </tr>
+            <tr>
+              <td><a href="#solar-10.7b-instruct">solar-10.7b-instruct</a></td>
+              <td><span class="status-badge ok">OK</span></td>
+              <td>0</td>
+              <td>2</td>
+              <td>-</td>
+            </tr>
+            <tr>
+              <td><a href="#jamba-1.5-mini-instruct">jamba-1.5-mini-instruct</a></td>
+              <td><span class="status-badge ok">OK</span></td>
+              <td>1</td>
+              <td>14</td>
+              <td>null cleanup</td>
+            </tr>
+            <tr>
+              <td><a href="#chatglm3-6b">chatglm3-6b</a></td>
+              <td><span class="status-badge ok">OK</span></td>
+              <td>1</td>
+              <td>11</td>
+              <td>null cleanup</td>
+            </tr>
+    </tbody>
+  </table>
+</div>
+
+<h2 style="margin-bottom:20px;font-size:20px;padding-bottom:8px;border-bottom:1px solid var(--border)">
+  Per-Model Details
+</h2>
+
+
+    <div class="model-card" id="llama-3.3-70b-instruct">
+      <div class="model-header">
+        <h3>meta/llama-3.3-70b-instruct</h3>
+        <div class="header-badges">
+          <span class="status-badge ok">OK</span>
+          <span class="count-badge fixed">1 fixed</span>
+          <span class="count-badge extra">14 extra fields</span>
+        </div>
+      </div>
+
+      <div class="deviations">
+        <h4>Deviations Found (15)</h4>
+        
+            <div class="dev-item fix-applied">
+              <div class="dev-label"><span class="badge" style="background:#fd7e14">NULL</span> prompt_tokens_details: null</div>
+              <div class="dev-arrow">&#8594;</div>
+              <div class="dev-fix">Field omitted</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: service_tier</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through (adapter preserves unknown fields)</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: system_fingerprint</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through (adapter preserves unknown fields)</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: prompt_logprobs</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through (adapter preserves unknown fields)</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: prompt_token_ids</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through (adapter preserves unknown fields)</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: kv_transfer_params</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through (adapter preserves unknown fields)</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: choices[].logprobs</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: choices[].stop_reason</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: choices[].token_ids</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: message.refusal</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: message.annotations</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: message.audio</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: message.function_call</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: message.tool_calls</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: message.reasoning</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through</div>
+            </div>
+      </div>
+
+      <div class="panels">
+        <div class="panel raw">
+          <div class="panel-label">Raw Nvidia Response</div>
+          <pre><code>{
+  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;chatcmpl-921539eca3e1872f&quot;</span>,
+  <span class='json-key'>"object"</span>: <span class='json-str'>&quot;chat.completion&quot;</span>,
+  <span class='json-key'>"created"</span>: <span class='json-num'>1772726753</span>,
+  <span class='json-key'>"model"</span>: <span class='json-str'>&quot;meta/llama-3.3-70b-instruct&quot;</span>,
+  <span class='json-key'>"choices"</span>: [
+    {
+      <span class='json-key'>"index"</span>: <span class='json-num'>0</span>,
+      <span class='json-key'>"message"</span>: {
+        <span class='json-key'>"role"</span>: <span class='json-str'>&quot;assistant&quot;</span>,
+        <span class='json-key'>"content"</span>: <span class='json-str'>&quot;To calculate 25 * 37, I&#x27;ll break it down step by step:\n\n1. Multiply 25 by 30: 25 * 30 = 750\n2. Multiply 25 by 7: 25 * 7 = 175\n3. Add the results from ... (200 chars)&quot;</span>,
+        <span class="hl-extra"><span class='json-key'>"refusal"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
+        <span class="hl-extra"><span class='json-key'>"annotations"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
+        <span class="hl-extra"><span class='json-key'>"audio"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
+        <span class="hl-extra"><span class='json-key'>"function_call"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
+        <span class="hl-extra"><span class='json-key'>"tool_calls"</span>: <span class="hl-extra">[]</span></span>,
+        <span class="hl-extra"><span class='json-key'>"reasoning"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
+        <span class='json-key'>"reasoning_content"</span>: <span class='json-null'>null</span>
+      },
+      <span class="hl-extra"><span class='json-key'>"logprobs"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
+      <span class='json-key'>"finish_reason"</span>: <span class='json-str'>&quot;stop&quot;</span>,
+      <span class="hl-extra"><span class='json-key'>"stop_reason"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
+      <span class="hl-extra"><span class='json-key'>"token_ids"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>
+    }
+  ],
+  <span class="hl-extra"><span class='json-key'>"service_tier"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
+  <span class="hl-extra"><span class='json-key'>"system_fingerprint"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
+  <span class='json-key'>"usage"</span>: {
+    <span class='json-key'>"prompt_tokens"</span>: <span class='json-num'>48</span>,
+    <span class='json-key'>"total_tokens"</span>: <span class='json-num'>135</span>,
+    <span class='json-key'>"completion_tokens"</span>: <span class='json-num'>87</span>,
+    <span class="hl-removed"><span class='json-key'>"prompt_tokens_details"</span>: <span class="hl-removed"><span class='json-null'>null</span></span></span>
+  },
+  <span class="hl-extra"><span class='json-key'>"prompt_logprobs"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
+  <span class="hl-extra"><span class='json-key'>"prompt_token_ids"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
+  <span class="hl-extra"><span class='json-key'>"kv_transfer_params"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>
+}</code></pre>
+        </div>
+        <div class="panel normalized">
+          <div class="panel-label">Adapter-Normalized</div>
+          <pre><code>{
+  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;chatcmpl-921539eca3e1872f&quot;</span>,
+  <span class='json-key'>"object"</span>: <span class='json-str'>&quot;chat.completion&quot;</span>,
+  <span class='json-key'>"created"</span>: <span class='json-num'>1772726753</span>,
+  <span class='json-key'>"model"</span>: <span class='json-str'>&quot;meta/llama-3.3-70b-instruct&quot;</span>,
+  <span class='json-key'>"choices"</span>: [
+    {
+      <span class='json-key'>"index"</span>: <span class='json-num'>0</span>,
+      <span class='json-key'>"message"</span>: {
+        <span class='json-key'>"role"</span>: <span class='json-str'>&quot;assistant&quot;</span>,
+        <span class='json-key'>"content"</span>: <span class='json-str'>&quot;To calculate 25 * 37, I&#x27;ll break it down step by step:\n\n1. Multiply 25 by 30: 25 * 30 = 750\n2. Multiply 25 by 7: 25 * 7 = 175\n3. Add the results from ... (200 chars)&quot;</span>,
+        <span class='json-key'>"refusal"</span>: <span class='json-null'>null</span>,
+        <span class='json-key'>"annotations"</span>: <span class='json-null'>null</span>,
+        <span class='json-key'>"audio"</span>: <span class='json-null'>null</span>,
+        <span class='json-key'>"function_call"</span>: <span class='json-null'>null</span>,
+        <span class='json-key'>"tool_calls"</span>: [],
+        <span class='json-key'>"reasoning"</span>: <span class='json-null'>null</span>
+      },
+      <span class='json-key'>"logprobs"</span>: <span class='json-null'>null</span>,
+      <span class='json-key'>"finish_reason"</span>: <span class='json-str'>&quot;stop&quot;</span>,
+      <span class='json-key'>"stop_reason"</span>: <span class='json-null'>null</span>,
+      <span class='json-key'>"token_ids"</span>: <span class='json-null'>null</span>
+    }
+  ],
+  <span class='json-key'>"service_tier"</span>: <span class='json-null'>null</span>,
+  <span class='json-key'>"system_fingerprint"</span>: <span class='json-null'>null</span>,
+  <span class='json-key'>"usage"</span>: {
+    <span class='json-key'>"prompt_tokens"</span>: <span class='json-num'>48</span>,
+    <span class='json-key'>"total_tokens"</span>: <span class='json-num'>135</span>,
+    <span class='json-key'>"completion_tokens"</span>: <span class='json-num'>87</span>
+  },
+  <span class='json-key'>"prompt_logprobs"</span>: <span class='json-null'>null</span>,
+  <span class='json-key'>"prompt_token_ids"</span>: <span class='json-null'>null</span>,
+  <span class='json-key'>"kv_transfer_params"</span>: <span class='json-null'>null</span>
+}</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="model-card" id="gemma-3-27b-it">
+      <div class="model-header">
+        <h3>google/gemma-3-27b-it</h3>
+        <div class="header-badges">
+          <span class="status-badge ok">OK</span>
+          <span class="count-badge fixed">1 fixed</span>
+          <span class="count-badge extra">11 extra fields</span>
+        </div>
+      </div>
+
+      <div class="deviations">
+        <h4>Deviations Found (12)</h4>
+        
+            <div class="dev-item fix-applied">
+              <div class="dev-label"><span class="badge" style="background:#fd7e14">NULL</span> prompt_tokens_details: null</div>
+              <div class="dev-arrow">&#8594;</div>
+              <div class="dev-fix">Field omitted</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: service_tier</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through (adapter preserves unknown fields)</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: system_fingerprint</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through (adapter preserves unknown fields)</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: prompt_logprobs</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through (adapter preserves unknown fields)</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: kv_transfer_params</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through (adapter preserves unknown fields)</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: choices[].logprobs</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: choices[].stop_reason</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: message.refusal</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: message.annotations</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: message.audio</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: message.function_call</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: message.tool_calls</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through</div>
+            </div>
+      </div>
+
+      <div class="panels">
+        <div class="panel raw">
+          <div class="panel-label">Raw Nvidia Response</div>
+          <pre><code>{
+  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;chatcmpl-9735ce30f46d482694c3ef7392cf4111&quot;</span>,
+  <span class='json-key'>"object"</span>: <span class='json-str'>&quot;chat.completion&quot;</span>,
+  <span class='json-key'>"created"</span>: <span class='json-num'>1772726914</span>,
+  <span class='json-key'>"model"</span>: <span class='json-str'>&quot;google/gemma-3-27b-it&quot;</span>,
+  <span class='json-key'>"choices"</span>: [
+    {
+      <span class='json-key'>"index"</span>: <span class='json-num'>0</span>,
+      <span class='json-key'>"message"</span>: {
+        <span class='json-key'>"role"</span>: <span class='json-str'>&quot;assistant&quot;</span>,
+        <span class='json-key'>"content"</span>: <span class='json-str'>&quot;Okay, let&#x27;s calculate 25 * 37 step by step:\n\n**1. Break down 37:**\n\nWe can think of 37 as (30 + 7).\n\n**2. Distribute the 25:**\n\nNow we can multiply 25... (397 chars)&quot;</span>,
+        <span class="hl-extra"><span class='json-key'>"refusal"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
+        <span class="hl-extra"><span class='json-key'>"annotations"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
+        <span class="hl-extra"><span class='json-key'>"audio"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
+        <span class="hl-extra"><span class='json-key'>"function_call"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
+        <span class="hl-extra"><span class='json-key'>"tool_calls"</span>: <span class="hl-extra">[]</span></span>,
+        <span class='json-key'>"reasoning_content"</span>: <span class='json-null'>null</span>
+      },
+      <span class="hl-extra"><span class='json-key'>"logprobs"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
+      <span class='json-key'>"finish_reason"</span>: <span class='json-str'>&quot;stop&quot;</span>,
+      <span class="hl-extra"><span class='json-key'>"stop_reason"</span>: <span class="hl-extra"><span class='json-num'>106</span></span></span>
+    }
+  ],
+  <span class="hl-extra"><span class='json-key'>"service_tier"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
+  <span class="hl-extra"><span class='json-key'>"system_fingerprint"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
+  <span class='json-key'>"usage"</span>: {
+    <span class='json-key'>"prompt_tokens"</span>: <span class='json-num'>24</span>,
+    <span class='json-key'>"total_tokens"</span>: <span class='json-num'>226</span>,
+    <span class='json-key'>"completion_tokens"</span>: <span class='json-num'>202</span>,
+    <span class="hl-removed"><span class='json-key'>"prompt_tokens_details"</span>: <span class="hl-removed"><span class='json-null'>null</span></span></span>
+  },
+  <span class="hl-extra"><span class='json-key'>"prompt_logprobs"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
+  <span class="hl-extra"><span class='json-key'>"kv_transfer_params"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>
+}</code></pre>
+        </div>
+        <div class="panel normalized">
+          <div class="panel-label">Adapter-Normalized</div>
+          <pre><code>{
+  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;chatcmpl-9735ce30f46d482694c3ef7392cf4111&quot;</span>,
+  <span class='json-key'>"object"</span>: <span class='json-str'>&quot;chat.completion&quot;</span>,
+  <span class='json-key'>"created"</span>: <span class='json-num'>1772726914</span>,
+  <span class='json-key'>"model"</span>: <span class='json-str'>&quot;google/gemma-3-27b-it&quot;</span>,
+  <span class='json-key'>"choices"</span>: [
+    {
+      <span class='json-key'>"index"</span>: <span class='json-num'>0</span>,
+      <span class='json-key'>"message"</span>: {
+        <span class='json-key'>"role"</span>: <span class='json-str'>&quot;assistant&quot;</span>,
+        <span class='json-key'>"content"</span>: <span class='json-str'>&quot;Okay, let&#x27;s calculate 25 * 37 step by step:\n\n**1. Break down 37:**\n\nWe can think of 37 as (30 + 7).\n\n**2. Distribute the 25:**\n\nNow we can multiply 25... (397 chars)&quot;</span>,
+        <span class='json-key'>"refusal"</span>: <span class='json-null'>null</span>,
+        <span class='json-key'>"annotations"</span>: <span class='json-null'>null</span>,
+        <span class='json-key'>"audio"</span>: <span class='json-null'>null</span>,
+        <span class='json-key'>"function_call"</span>: <span class='json-null'>null</span>,
+        <span class='json-key'>"tool_calls"</span>: []
+      },
+      <span class='json-key'>"logprobs"</span>: <span class='json-null'>null</span>,
+      <span class='json-key'>"finish_reason"</span>: <span class='json-str'>&quot;stop&quot;</span>,
+      <span class='json-key'>"stop_reason"</span>: <span class='json-num'>106</span>
+    }
+  ],
+  <span class='json-key'>"service_tier"</span>: <span class='json-null'>null</span>,
+  <span class='json-key'>"system_fingerprint"</span>: <span class='json-null'>null</span>,
+  <span class='json-key'>"usage"</span>: {
+    <span class='json-key'>"prompt_tokens"</span>: <span class='json-num'>24</span>,
+    <span class='json-key'>"total_tokens"</span>: <span class='json-num'>226</span>,
+    <span class='json-key'>"completion_tokens"</span>: <span class='json-num'>202</span>
+  },
+  <span class='json-key'>"prompt_logprobs"</span>: <span class='json-null'>null</span>,
+  <span class='json-key'>"kv_transfer_params"</span>: <span class='json-null'>null</span>
+}</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="model-card" id="mistral-small-3.1-24b-instruct-2503">
+      <div class="model-header">
+        <h3>mistralai/mistral-small-3.1-24b-instruct-2503</h3>
+        <div class="header-badges">
+          <span class="status-badge ok">OK</span>
+          <span class="count-badge fixed">1 fixed</span>
+          <span class="count-badge extra">4 extra fields</span>
+        </div>
+      </div>
+
+      <div class="deviations">
+        <h4>Deviations Found (5)</h4>
+        
+            <div class="dev-item fix-applied">
+              <div class="dev-label"><span class="badge" style="background:#fd7e14">NULL</span> prompt_tokens_details: null</div>
+              <div class="dev-arrow">&#8594;</div>
+              <div class="dev-fix">Field omitted</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: prompt_logprobs</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through (adapter preserves unknown fields)</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: choices[].logprobs</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: choices[].stop_reason</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: message.tool_calls</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through</div>
+            </div>
+      </div>
+
+      <div class="panels">
+        <div class="panel raw">
+          <div class="panel-label">Raw Nvidia Response</div>
+          <pre><code>{
+  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;chatcmpl-af3ff87dbec24b73adee54b0c5e9d21e&quot;</span>,
+  <span class='json-key'>"object"</span>: <span class='json-str'>&quot;chat.completion&quot;</span>,
+  <span class='json-key'>"created"</span>: <span class='json-num'>1772726919</span>,
+  <span class='json-key'>"model"</span>: <span class='json-str'>&quot;mistralai/mistral-small-3.1-24b-instruct-2503&quot;</span>,
+  <span class='json-key'>"choices"</span>: [
+    {
+      <span class='json-key'>"index"</span>: <span class='json-num'>0</span>,
+      <span class='json-key'>"message"</span>: {
+        <span class='json-key'>"role"</span>: <span class='json-str'>&quot;assistant&quot;</span>,
+        <span class='json-key'>"reasoning_content"</span>: <span class='json-null'>null</span>,
+        <span class='json-key'>"content"</span>: <span class='json-str'>&quot;To calculate 25 * 37, you can use the multiplication steps as follows:\n\n1. Multiply 25 by 7 (the ones place in 37):\n   25 * 7 = 175\n\n2. Multiply 25 by... (338 chars)&quot;</span>,
+        <span class="hl-extra"><span class='json-key'>"tool_calls"</span>: <span class="hl-extra">[]</span></span>
+      },
+      <span class="hl-extra"><span class='json-key'>"logprobs"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
+      <span class='json-key'>"finish_reason"</span>: <span class='json-str'>&quot;stop&quot;</span>,
+      <span class="hl-extra"><span class='json-key'>"stop_reason"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>
+    }
+  ],
+  <span class='json-key'>"usage"</span>: {
+    <span class='json-key'>"prompt_tokens"</span>: <span class='json-num'>18</span>,
+    <span class='json-key'>"total_tokens"</span>: <span class='json-num'>163</span>,
+    <span class='json-key'>"completion_tokens"</span>: <span class='json-num'>145</span>,
+    <span class="hl-removed"><span class='json-key'>"prompt_tokens_details"</span>: <span class="hl-removed"><span class='json-null'>null</span></span></span>
+  },
+  <span class="hl-extra"><span class='json-key'>"prompt_logprobs"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>
+}</code></pre>
+        </div>
+        <div class="panel normalized">
+          <div class="panel-label">Adapter-Normalized</div>
+          <pre><code>{
+  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;chatcmpl-af3ff87dbec24b73adee54b0c5e9d21e&quot;</span>,
+  <span class='json-key'>"object"</span>: <span class='json-str'>&quot;chat.completion&quot;</span>,
+  <span class='json-key'>"created"</span>: <span class='json-num'>1772726919</span>,
+  <span class='json-key'>"model"</span>: <span class='json-str'>&quot;mistralai/mistral-small-3.1-24b-instruct-2503&quot;</span>,
+  <span class='json-key'>"choices"</span>: [
+    {
+      <span class='json-key'>"index"</span>: <span class='json-num'>0</span>,
+      <span class='json-key'>"message"</span>: {
+        <span class='json-key'>"role"</span>: <span class='json-str'>&quot;assistant&quot;</span>,
+        <span class='json-key'>"content"</span>: <span class='json-str'>&quot;To calculate 25 * 37, you can use the multiplication steps as follows:\n\n1. Multiply 25 by 7 (the ones place in 37):\n   25 * 7 = 175\n\n2. Multiply 25 by... (338 chars)&quot;</span>,
+        <span class='json-key'>"tool_calls"</span>: []
+      },
+      <span class='json-key'>"logprobs"</span>: <span class='json-null'>null</span>,
+      <span class='json-key'>"finish_reason"</span>: <span class='json-str'>&quot;stop&quot;</span>,
+      <span class='json-key'>"stop_reason"</span>: <span class='json-null'>null</span>
+    }
+  ],
+  <span class='json-key'>"usage"</span>: {
+    <span class='json-key'>"prompt_tokens"</span>: <span class='json-num'>18</span>,
+    <span class='json-key'>"total_tokens"</span>: <span class='json-num'>163</span>,
+    <span class='json-key'>"completion_tokens"</span>: <span class='json-num'>145</span>
+  },
+  <span class='json-key'>"prompt_logprobs"</span>: <span class='json-null'>null</span>
+}</code></pre>
+        </div>
+      </div>
+    </div>
+
+        <div class="model-card error">
+          <div class="model-header">
+            <h3>deepseek-r1-distill-qwen-14b</h3>
+            <span class="status-badge error">ERROR</span>
+          </div>
+          <p class="error-msg">Server error &#x27;500 Internal Server Error&#x27; for url &#x27;https://integrate.api.nvidia.com/v1/chat/completions&#x27;
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500</p>
+        </div>
+
+    <div class="model-card" id="phi-4-mini-flash-reasoning">
+      <div class="model-header">
+        <h3>microsoft/phi-4-mini-flash-reasoning</h3>
+        <div class="header-badges">
+          <span class="status-badge ok">OK</span>
+          <span class="count-badge fixed">2 fixed</span>
+          <span class="count-badge extra">11 extra fields</span>
+        </div>
+      </div>
+
+      <div class="deviations">
+        <h4>Deviations Found (13)</h4>
+        
+            <div class="dev-item fix-applied">
+              <div class="dev-label"><span class="badge" style="background:#dc3545">THINKING</span> &lt;think&gt; tags in content</div>
+              <div class="dev-arrow">&#8594;</div>
+              <div class="dev-fix">Extracted to message.thinking.content, content cleaned</div>
+            </div>
+            <div class="dev-item fix-applied">
+              <div class="dev-label"><span class="badge" style="background:#fd7e14">NULL</span> prompt_tokens_details: null</div>
+              <div class="dev-arrow">&#8594;</div>
+              <div class="dev-fix">Field omitted</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: service_tier</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through (adapter preserves unknown fields)</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: system_fingerprint</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through (adapter preserves unknown fields)</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: prompt_logprobs</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through (adapter preserves unknown fields)</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: kv_transfer_params</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through (adapter preserves unknown fields)</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: choices[].logprobs</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: choices[].stop_reason</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: message.refusal</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: message.annotations</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: message.audio</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: message.function_call</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: message.tool_calls</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through</div>
+            </div>
+      </div>
+
+      <div class="panels">
+        <div class="panel raw">
+          <div class="panel-label">Raw Nvidia Response</div>
+          <pre><code>{
+  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;chatcmpl-14d917a5ba4b43bfad551468f467cc94&quot;</span>,
+  <span class='json-key'>"object"</span>: <span class='json-str'>&quot;chat.completion&quot;</span>,
+  <span class='json-key'>"created"</span>: <span class='json-num'>1772726929</span>,
+  <span class='json-key'>"model"</span>: <span class='json-str'>&quot;microsoft/phi-4-mini-flash-reasoning&quot;</span>,
+  <span class='json-key'>"choices"</span>: [
+    {
+      <span class='json-key'>"index"</span>: <span class='json-num'>0</span>,
+      <span class='json-key'>"message"</span>: {
+        <span class='json-key'>"role"</span>: <span class='json-str'>&quot;assistant&quot;</span>,
+        <span class="hl-removed"><span class='json-key'>"content"</span>: <span class="hl-removed"><span class='json-str'>&quot;&lt;think&gt;\nOkay, so I need to figure out what 25 multiplied by 37 is. Let me think about how to approach this. I know that multiplying two numbers can so... (3176 chars)&quot;</span></span></span>,
+        <span class="hl-extra"><span class='json-key'>"refusal"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
+        <span class="hl-extra"><span class='json-key'>"annotations"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
+        <span class="hl-extra"><span class='json-key'>"audio"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
+        <span class="hl-extra"><span class='json-key'>"function_call"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
+        <span class="hl-extra"><span class='json-key'>"tool_calls"</span>: <span class="hl-extra">[]</span></span>,
+        <span class='json-key'>"reasoning_content"</span>: <span class='json-null'>null</span>
+      },
+      <span class="hl-extra"><span class='json-key'>"logprobs"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
+      <span class='json-key'>"finish_reason"</span>: <span class='json-str'>&quot;length&quot;</span>,
+      <span class="hl-extra"><span class='json-key'>"stop_reason"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>
+    }
+  ],
+  <span class="hl-extra"><span class='json-key'>"service_tier"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
+  <span class="hl-extra"><span class='json-key'>"system_fingerprint"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
+  <span class='json-key'>"usage"</span>: {
+    <span class='json-key'>"prompt_tokens"</span>: <span class='json-num'>16</span>,
+    <span class='json-key'>"total_tokens"</span>: <span class='json-num'>1040</span>,
+    <span class='json-key'>"completion_tokens"</span>: <span class='json-num'>1024</span>,
+    <span class="hl-removed"><span class='json-key'>"prompt_tokens_details"</span>: <span class="hl-removed"><span class='json-null'>null</span></span></span>
+  },
+  <span class="hl-extra"><span class='json-key'>"prompt_logprobs"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
+  <span class="hl-extra"><span class='json-key'>"kv_transfer_params"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>
+}</code></pre>
+        </div>
+        <div class="panel normalized">
+          <div class="panel-label">Adapter-Normalized</div>
+          <pre><code>{
+  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;chatcmpl-14d917a5ba4b43bfad551468f467cc94&quot;</span>,
+  <span class='json-key'>"object"</span>: <span class='json-str'>&quot;chat.completion&quot;</span>,
+  <span class='json-key'>"created"</span>: <span class='json-num'>1772726929</span>,
+  <span class='json-key'>"model"</span>: <span class='json-str'>&quot;microsoft/phi-4-mini-flash-reasoning&quot;</span>,
+  <span class='json-key'>"choices"</span>: [
+    {
+      <span class='json-key'>"index"</span>: <span class='json-num'>0</span>,
+      <span class='json-key'>"message"</span>: {
+        <span class='json-key'>"role"</span>: <span class='json-str'>&quot;assistant&quot;</span>,
+        <span class="hl-added"><span class='json-key'>"content"</span>: <span class="hl-added"><span class='json-str'>&quot;&lt;think&gt;\nOkay, so I need to figure out what 25 multiplied by 37 is. Let me think about how to approach this. I know that multiplying two numbers can so... (3176 chars)&quot;</span></span></span>,
+        <span class='json-key'>"refusal"</span>: <span class='json-null'>null</span>,
+        <span class='json-key'>"annotations"</span>: <span class='json-null'>null</span>,
+        <span class='json-key'>"audio"</span>: <span class='json-null'>null</span>,
+        <span class='json-key'>"function_call"</span>: <span class='json-null'>null</span>,
+        <span class='json-key'>"tool_calls"</span>: []
+      },
+      <span class='json-key'>"logprobs"</span>: <span class='json-null'>null</span>,
+      <span class='json-key'>"finish_reason"</span>: <span class='json-str'>&quot;length&quot;</span>,
+      <span class='json-key'>"stop_reason"</span>: <span class='json-null'>null</span>
+    }
+  ],
+  <span class='json-key'>"service_tier"</span>: <span class='json-null'>null</span>,
+  <span class='json-key'>"system_fingerprint"</span>: <span class='json-null'>null</span>,
+  <span class='json-key'>"usage"</span>: {
+    <span class='json-key'>"prompt_tokens"</span>: <span class='json-num'>16</span>,
+    <span class='json-key'>"total_tokens"</span>: <span class='json-num'>1040</span>,
+    <span class='json-key'>"completion_tokens"</span>: <span class='json-num'>1024</span>
+  },
+  <span class='json-key'>"prompt_logprobs"</span>: <span class='json-null'>null</span>,
+  <span class='json-key'>"kv_transfer_params"</span>: <span class='json-null'>null</span>
+}</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="model-card" id="llama-3.1-nemotron-ultra-253b-v1">
+      <div class="model-header">
+        <h3>nvidia/llama-3.1-nemotron-ultra-253b-v1</h3>
+        <div class="header-badges">
+          <span class="status-badge ok">OK</span>
+          <span class="count-badge fixed">2 fixed</span>
+          <span class="count-badge extra">13 extra fields</span>
+        </div>
+      </div>
+
+      <div class="deviations">
+        <h4>Deviations Found (15)</h4>
+        
+            <div class="dev-item fix-applied">
+              <div class="dev-label"><span class="badge" style="background:#dc3545">THINKING</span> reasoning_content field</div>
+              <div class="dev-arrow">&#8594;</div>
+              <div class="dev-fix">Moved to message.thinking.content, field removed</div>
+            </div>
+            <div class="dev-item fix-applied">
+              <div class="dev-label"><span class="badge" style="background:#fd7e14">NULL</span> prompt_tokens_details: null</div>
+              <div class="dev-arrow">&#8594;</div>
+              <div class="dev-fix">Field omitted</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: service_tier</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through (adapter preserves unknown fields)</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: system_fingerprint</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through (adapter preserves unknown fields)</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: prompt_logprobs</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through (adapter preserves unknown fields)</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: prompt_token_ids</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through (adapter preserves unknown fields)</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: kv_transfer_params</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through (adapter preserves unknown fields)</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: choices[].logprobs</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: choices[].stop_reason</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: choices[].token_ids</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: message.refusal</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: message.annotations</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: message.audio</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: message.function_call</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: message.tool_calls</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through</div>
+            </div>
+      </div>
+
+      <div class="panels">
+        <div class="panel raw">
+          <div class="panel-label">Raw Nvidia Response</div>
+          <pre><code>{
+  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;chatcmpl-89f465d3825948e18423d4f713e7a13f&quot;</span>,
+  <span class='json-key'>"object"</span>: <span class='json-str'>&quot;chat.completion&quot;</span>,
+  <span class='json-key'>"created"</span>: <span class='json-num'>1772726982</span>,
+  <span class='json-key'>"model"</span>: <span class='json-str'>&quot;stg/nvidia/llama-3.1-nemotron-ultra-253b-v1&quot;</span>,
+  <span class='json-key'>"choices"</span>: [
+    {
+      <span class='json-key'>"index"</span>: <span class='json-num'>0</span>,
+      <span class='json-key'>"message"</span>: {
+        <span class='json-key'>"role"</span>: <span class='json-str'>&quot;assistant&quot;</span>,
+        <span class='json-key'>"content"</span>: <span class='json-str'>&quot;To calculate \\(25 \\times 37\\), you can use the distributive property to break it down into simpler steps:\n\n1. **Split 37 into 30 and 7:**\n   \\[\n   25 ... (572 chars)&quot;</span>,
+        <span class="hl-extra"><span class='json-key'>"refusal"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
+        <span class="hl-extra"><span class='json-key'>"annotations"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
+        <span class="hl-extra"><span class='json-key'>"audio"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
+        <span class="hl-extra"><span class='json-key'>"function_call"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
+        <span class="hl-extra"><span class='json-key'>"tool_calls"</span>: <span class="hl-extra">[]</span></span>,
+        <span class="hl-removed"><span class='json-key'>"reasoning_content"</span>: <span class="hl-removed"><span class='json-str'>&quot;Okay, so I need to figure out what 25 multiplied by 37 is. Let me think. First, I know that multiplication is essentially repeated addition, but doing... (2401 chars)&quot;</span></span></span>
+      },
+      <span class="hl-extra"><span class='json-key'>"logprobs"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
+      <span class='json-key'>"finish_reason"</span>: <span class='json-str'>&quot;stop&quot;</span>,
+      <span class="hl-extra"><span class='json-key'>"stop_reason"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
+      <span class="hl-extra"><span class='json-key'>"token_ids"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>
+    }
+  ],
+  <span class="hl-extra"><span class='json-key'>"service_tier"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
+  <span class="hl-extra"><span class='json-key'>"system_fingerprint"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
+  <span class='json-key'>"usage"</span>: {
+    <span class='json-key'>"prompt_tokens"</span>: <span class='json-num'>32</span>,
+    <span class='json-key'>"total_tokens"</span>: <span class='json-num'>1017</span>,
+    <span class='json-key'>"completion_tokens"</span>: <span class='json-num'>985</span>,
+    <span class="hl-removed"><span class='json-key'>"prompt_tokens_details"</span>: <span class="hl-removed"><span class='json-null'>null</span></span></span>
+  },
+  <span class="hl-extra"><span class='json-key'>"prompt_logprobs"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
+  <span class="hl-extra"><span class='json-key'>"prompt_token_ids"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
+  <span class="hl-extra"><span class='json-key'>"kv_transfer_params"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>
+}</code></pre>
+        </div>
+        <div class="panel normalized">
+          <div class="panel-label">Adapter-Normalized</div>
+          <pre><code>{
+  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;chatcmpl-89f465d3825948e18423d4f713e7a13f&quot;</span>,
+  <span class='json-key'>"object"</span>: <span class='json-str'>&quot;chat.completion&quot;</span>,
+  <span class='json-key'>"created"</span>: <span class='json-num'>1772726982</span>,
+  <span class='json-key'>"model"</span>: <span class='json-str'>&quot;stg/nvidia/llama-3.1-nemotron-ultra-253b-v1&quot;</span>,
+  <span class='json-key'>"choices"</span>: [
+    {
+      <span class='json-key'>"index"</span>: <span class='json-num'>0</span>,
+      <span class='json-key'>"message"</span>: {
+        <span class='json-key'>"role"</span>: <span class='json-str'>&quot;assistant&quot;</span>,
+        <span class='json-key'>"content"</span>: <span class='json-str'>&quot;To calculate \\(25 \\times 37\\), you can use the distributive property to break it down into simpler steps:\n\n1. **Split 37 into 30 and 7:**\n   \\[\n   25 ... (572 chars)&quot;</span>,
+        <span class='json-key'>"refusal"</span>: <span class='json-null'>null</span>,
+        <span class='json-key'>"annotations"</span>: <span class='json-null'>null</span>,
+        <span class='json-key'>"audio"</span>: <span class='json-null'>null</span>,
+        <span class='json-key'>"function_call"</span>: <span class='json-null'>null</span>,
+        <span class='json-key'>"tool_calls"</span>: [],
+        <span class="hl-added"><span class='json-key'>"thinking"</span>: {
+          <span class="hl-added"><span class='json-key'>"content"</span>: <span class="hl-added"><span class='json-str'>&quot;Okay, so I need to figure out what 25 multiplied by 37 is. Let me think. First, I know that multiplication is essentially repeated addition, but doing... (2401 chars)&quot;</span></span></span>
+        }</span>
+      },
+      <span class='json-key'>"logprobs"</span>: <span class='json-null'>null</span>,
+      <span class='json-key'>"finish_reason"</span>: <span class='json-str'>&quot;stop&quot;</span>,
+      <span class='json-key'>"stop_reason"</span>: <span class='json-null'>null</span>,
+      <span class='json-key'>"token_ids"</span>: <span class='json-null'>null</span>
+    }
+  ],
+  <span class='json-key'>"service_tier"</span>: <span class='json-null'>null</span>,
+  <span class='json-key'>"system_fingerprint"</span>: <span class='json-null'>null</span>,
+  <span class='json-key'>"usage"</span>: {
+    <span class='json-key'>"prompt_tokens"</span>: <span class='json-num'>32</span>,
+    <span class='json-key'>"total_tokens"</span>: <span class='json-num'>1017</span>,
+    <span class='json-key'>"completion_tokens"</span>: <span class='json-num'>985</span>
+  },
+  <span class='json-key'>"prompt_logprobs"</span>: <span class='json-null'>null</span>,
+  <span class='json-key'>"prompt_token_ids"</span>: <span class='json-null'>null</span>,
+  <span class='json-key'>"kv_transfer_params"</span>: <span class='json-null'>null</span>
+}</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="model-card" id="nemotron-mini-4b-instruct">
+      <div class="model-header">
+        <h3>nvidia/nemotron-mini-4b-instruct</h3>
+        <div class="header-badges">
+          <span class="status-badge ok">OK</span>
+          <span class="count-badge fixed">0 fixed</span>
+          <span class="count-badge extra">2 extra fields</span>
+        </div>
+      </div>
+
+      <div class="deviations">
+        <h4>Deviations Found (2)</h4>
+        
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: choices[].logprobs</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: choices[].stop_reason</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through</div>
+            </div>
+      </div>
+
+      <div class="panels">
+        <div class="panel raw">
+          <div class="panel-label">Raw Nvidia Response</div>
+          <pre><code>{
+  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;chat-e69224c1d3d649bdad7c13d1d921fe45&quot;</span>,
+  <span class='json-key'>"object"</span>: <span class='json-str'>&quot;chat.completion&quot;</span>,
+  <span class='json-key'>"created"</span>: <span class='json-num'>1772726985</span>,
+  <span class='json-key'>"model"</span>: <span class='json-str'>&quot;nvidia/nemotron-mini-4b-instruct&quot;</span>,
+  <span class='json-key'>"choices"</span>: [
+    {
+      <span class='json-key'>"index"</span>: <span class='json-num'>0</span>,
+      <span class='json-key'>"message"</span>: {
+        <span class='json-key'>"role"</span>: <span class='json-str'>&quot;assistant&quot;</span>,
+        <span class='json-key'>"content"</span>: <span class='json-str'>&quot;Sure, I&#x27;d be happy to help you calculate 25 * 37 step-by-step. Here&#x27;s the process:\n\n1. Break down the problem: We are asked to multiply the numbers 25... (758 chars)&quot;</span>
+      },
+      <span class="hl-extra"><span class='json-key'>"logprobs"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
+      <span class='json-key'>"finish_reason"</span>: <span class='json-str'>&quot;stop&quot;</span>,
+      <span class="hl-extra"><span class='json-key'>"stop_reason"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>
+    }
+  ],
+  <span class='json-key'>"usage"</span>: {
+    <span class='json-key'>"prompt_tokens"</span>: <span class='json-num'>27</span>,
+    <span class='json-key'>"total_tokens"</span>: <span class='json-num'>284</span>,
+    <span class='json-key'>"completion_tokens"</span>: <span class='json-num'>257</span>
+  }
+}</code></pre>
+        </div>
+        <div class="panel normalized">
+          <div class="panel-label">Adapter-Normalized</div>
+          <pre><code>{
+  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;chat-e69224c1d3d649bdad7c13d1d921fe45&quot;</span>,
+  <span class='json-key'>"object"</span>: <span class='json-str'>&quot;chat.completion&quot;</span>,
+  <span class='json-key'>"created"</span>: <span class='json-num'>1772726985</span>,
+  <span class='json-key'>"model"</span>: <span class='json-str'>&quot;nvidia/nemotron-mini-4b-instruct&quot;</span>,
+  <span class='json-key'>"choices"</span>: [
+    {
+      <span class='json-key'>"index"</span>: <span class='json-num'>0</span>,
+      <span class='json-key'>"message"</span>: {
+        <span class='json-key'>"role"</span>: <span class='json-str'>&quot;assistant&quot;</span>,
+        <span class='json-key'>"content"</span>: <span class='json-str'>&quot;Sure, I&#x27;d be happy to help you calculate 25 * 37 step-by-step. Here&#x27;s the process:\n\n1. Break down the problem: We are asked to multiply the numbers 25... (758 chars)&quot;</span>
+      },
+      <span class='json-key'>"logprobs"</span>: <span class='json-null'>null</span>,
+      <span class='json-key'>"finish_reason"</span>: <span class='json-str'>&quot;stop&quot;</span>,
+      <span class='json-key'>"stop_reason"</span>: <span class='json-null'>null</span>
+    }
+  ],
+  <span class='json-key'>"usage"</span>: {
+    <span class='json-key'>"prompt_tokens"</span>: <span class='json-num'>27</span>,
+    <span class='json-key'>"total_tokens"</span>: <span class='json-num'>284</span>,
+    <span class='json-key'>"completion_tokens"</span>: <span class='json-num'>257</span>
+  }
+}</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="model-card" id="qwen2.5-coder-32b-instruct">
+      <div class="model-header">
+        <h3>qwen/qwen2.5-coder-32b-instruct</h3>
+        <div class="header-badges">
+          <span class="status-badge ok">OK</span>
+          <span class="count-badge fixed">0 fixed</span>
+          <span class="count-badge extra">3 extra fields</span>
+        </div>
+      </div>
+
+      <div class="deviations">
+        <h4>Deviations Found (3)</h4>
+        
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: prompt_logprobs</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through (adapter preserves unknown fields)</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: choices[].logprobs</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: choices[].stop_reason</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through</div>
+            </div>
+      </div>
+
+      <div class="panels">
+        <div class="panel raw">
+          <div class="panel-label">Raw Nvidia Response</div>
+          <pre><code>{
+  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;chat-f396d32059964ec89969f4e464cb283d&quot;</span>,
+  <span class='json-key'>"object"</span>: <span class='json-str'>&quot;chat.completion&quot;</span>,
+  <span class='json-key'>"created"</span>: <span class='json-num'>1772726990</span>,
+  <span class='json-key'>"model"</span>: <span class='json-str'>&quot;qwen/qwen2.5-coder-32b-instruct&quot;</span>,
+  <span class='json-key'>"choices"</span>: [
+    {
+      <span class='json-key'>"index"</span>: <span class='json-num'>0</span>,
+      <span class='json-key'>"message"</span>: {
+        <span class='json-key'>"role"</span>: <span class='json-str'>&quot;assistant&quot;</span>,
+        <span class='json-key'>"content"</span>: <span class='json-str'>&quot;Sure, let&#x27;s break down the multiplication of 25 * 37 step by step:\n\n1. **Separate the numbers**:\n   - 25 is already in a simple form.\n   - 37 can be s... (676 chars)&quot;</span>
+      },
+      <span class="hl-extra"><span class='json-key'>"logprobs"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
+      <span class='json-key'>"finish_reason"</span>: <span class='json-str'>&quot;stop&quot;</span>,
+      <span class="hl-extra"><span class='json-key'>"stop_reason"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>
+    }
+  ],
+  <span class='json-key'>"usage"</span>: {
+    <span class='json-key'>"prompt_tokens"</span>: <span class='json-num'>44</span>,
+    <span class='json-key'>"total_tokens"</span>: <span class='json-num'>314</span>,
+    <span class='json-key'>"completion_tokens"</span>: <span class='json-num'>270</span>
+  },
+  <span class="hl-extra"><span class='json-key'>"prompt_logprobs"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>
+}</code></pre>
+        </div>
+        <div class="panel normalized">
+          <div class="panel-label">Adapter-Normalized</div>
+          <pre><code>{
+  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;chat-f396d32059964ec89969f4e464cb283d&quot;</span>,
+  <span class='json-key'>"object"</span>: <span class='json-str'>&quot;chat.completion&quot;</span>,
+  <span class='json-key'>"created"</span>: <span class='json-num'>1772726990</span>,
+  <span class='json-key'>"model"</span>: <span class='json-str'>&quot;qwen/qwen2.5-coder-32b-instruct&quot;</span>,
+  <span class='json-key'>"choices"</span>: [
+    {
+      <span class='json-key'>"index"</span>: <span class='json-num'>0</span>,
+      <span class='json-key'>"message"</span>: {
+        <span class='json-key'>"role"</span>: <span class='json-str'>&quot;assistant&quot;</span>,
+        <span class='json-key'>"content"</span>: <span class='json-str'>&quot;Sure, let&#x27;s break down the multiplication of 25 * 37 step by step:\n\n1. **Separate the numbers**:\n   - 25 is already in a simple form.\n   - 37 can be s... (676 chars)&quot;</span>
+      },
+      <span class='json-key'>"logprobs"</span>: <span class='json-null'>null</span>,
+      <span class='json-key'>"finish_reason"</span>: <span class='json-str'>&quot;stop&quot;</span>,
+      <span class='json-key'>"stop_reason"</span>: <span class='json-null'>null</span>
+    }
+  ],
+  <span class='json-key'>"usage"</span>: {
+    <span class='json-key'>"prompt_tokens"</span>: <span class='json-num'>44</span>,
+    <span class='json-key'>"total_tokens"</span>: <span class='json-num'>314</span>,
+    <span class='json-key'>"completion_tokens"</span>: <span class='json-num'>270</span>
+  },
+  <span class='json-key'>"prompt_logprobs"</span>: <span class='json-null'>null</span>
+}</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="model-card" id="deepseek-r1-distill-llama-8b">
+      <div class="model-header">
+        <h3>deepseek-ai/deepseek-r1-distill-llama-8b</h3>
+        <div class="header-badges">
+          <span class="status-badge ok">OK</span>
+          <span class="count-badge fixed">1 fixed</span>
+          <span class="count-badge extra">3 extra fields</span>
+        </div>
+      </div>
+
+      <div class="deviations">
+        <h4>Deviations Found (4)</h4>
+        
+            <div class="dev-item fix-applied">
+              <div class="dev-label"><span class="badge" style="background:#dc3545">THINKING</span> &lt;think&gt; tags in content</div>
+              <div class="dev-arrow">&#8594;</div>
+              <div class="dev-fix">Extracted to message.thinking.content, content cleaned</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: prompt_logprobs</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through (adapter preserves unknown fields)</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: choices[].logprobs</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: choices[].stop_reason</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through</div>
+            </div>
+      </div>
+
+      <div class="panels">
+        <div class="panel raw">
+          <div class="panel-label">Raw Nvidia Response</div>
+          <pre><code>{
+  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;chat-8b4f1b0d254b4f37aeadca07b4ae51d8&quot;</span>,
+  <span class='json-key'>"object"</span>: <span class='json-str'>&quot;chat.completion&quot;</span>,
+  <span class='json-key'>"created"</span>: <span class='json-num'>1772726997</span>,
+  <span class='json-key'>"model"</span>: <span class='json-str'>&quot;deepseek-ai/deepseek-r1-distill-llama-8b&quot;</span>,
+  <span class='json-key'>"choices"</span>: [
+    {
+      <span class='json-key'>"index"</span>: <span class='json-num'>0</span>,
+      <span class='json-key'>"message"</span>: {
+        <span class='json-key'>"role"</span>: <span class='json-str'>&quot;assistant&quot;</span>,
+        <span class="hl-removed"><span class='json-key'>"content"</span>: <span class="hl-removed"><span class='json-str'>&quot;&lt;think&gt;\nTo calculate 25 multiplied by 37, I will break down the multiplication to make the process manageable.\n\nI can start by separating 37 into 30 a... (921 chars)&quot;</span></span></span>
+      },
+      <span class="hl-extra"><span class='json-key'>"logprobs"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
+      <span class='json-key'>"finish_reason"</span>: <span class='json-str'>&quot;stop&quot;</span>,
+      <span class="hl-extra"><span class='json-key'>"stop_reason"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>
+    }
+  ],
+  <span class='json-key'>"usage"</span>: {
+    <span class='json-key'>"prompt_tokens"</span>: <span class='json-num'>16</span>,
+    <span class='json-key'>"total_tokens"</span>: <span class='json-num'>291</span>,
+    <span class='json-key'>"completion_tokens"</span>: <span class='json-num'>275</span>
+  },
+  <span class="hl-extra"><span class='json-key'>"prompt_logprobs"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>
+}</code></pre>
+        </div>
+        <div class="panel normalized">
+          <div class="panel-label">Adapter-Normalized</div>
+          <pre><code>{
+  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;chat-8b4f1b0d254b4f37aeadca07b4ae51d8&quot;</span>,
+  <span class='json-key'>"object"</span>: <span class='json-str'>&quot;chat.completion&quot;</span>,
+  <span class='json-key'>"created"</span>: <span class='json-num'>1772726997</span>,
+  <span class='json-key'>"model"</span>: <span class='json-str'>&quot;deepseek-ai/deepseek-r1-distill-llama-8b&quot;</span>,
+  <span class='json-key'>"choices"</span>: [
+    {
+      <span class='json-key'>"index"</span>: <span class='json-num'>0</span>,
+      <span class='json-key'>"message"</span>: {
+        <span class='json-key'>"role"</span>: <span class='json-str'>&quot;assistant&quot;</span>,
+        <span class="hl-added"><span class='json-key'>"content"</span>: <span class="hl-added"><span class='json-str'>&quot;**Solution:**\n\nTo calculate \\( 25 \\times 37 \\), follow these easy steps:\n\n1. **Break Down the Multiplication:**\n   \\[\n   25 \\times 37 = 25 \\times (30 ... (416 chars)&quot;</span></span></span>,
+        <span class="hl-added"><span class='json-key'>"thinking"</span>: {
+          <span class="hl-added"><span class='json-key'>"content"</span>: <span class="hl-added"><span class='json-str'>&quot;To calculate 25 multiplied by 37, I will break down the multiplication to make the process manageable.\n\nI can start by separating 37 into 30 and 7. Th... (486 chars)&quot;</span></span></span>
+        }</span>
+      },
+      <span class='json-key'>"logprobs"</span>: <span class='json-null'>null</span>,
+      <span class='json-key'>"finish_reason"</span>: <span class='json-str'>&quot;stop&quot;</span>,
+      <span class='json-key'>"stop_reason"</span>: <span class='json-null'>null</span>
+    }
+  ],
+  <span class='json-key'>"usage"</span>: {
+    <span class='json-key'>"prompt_tokens"</span>: <span class='json-num'>16</span>,
+    <span class='json-key'>"total_tokens"</span>: <span class='json-num'>291</span>,
+    <span class='json-key'>"completion_tokens"</span>: <span class='json-num'>275</span>
+  },
+  <span class='json-key'>"prompt_logprobs"</span>: <span class='json-null'>null</span>
+}</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="model-card" id="solar-10.7b-instruct">
+      <div class="model-header">
+        <h3>upstage/solar-10.7b-instruct</h3>
+        <div class="header-badges">
+          <span class="status-badge ok">OK</span>
+          <span class="count-badge fixed">0 fixed</span>
+          <span class="count-badge extra">2 extra fields</span>
+        </div>
+      </div>
+
+      <div class="deviations">
+        <h4>Deviations Found (2)</h4>
+        
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: choices[].logprobs</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: choices[].stop_reason</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through</div>
+            </div>
+      </div>
+
+      <div class="panels">
+        <div class="panel raw">
+          <div class="panel-label">Raw Nvidia Response</div>
+          <pre><code>{
+  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;cmpl-81ee4acbb8ee4b3fb3c1f3d512efa8f9&quot;</span>,
+  <span class='json-key'>"object"</span>: <span class='json-str'>&quot;chat.completion&quot;</span>,
+  <span class='json-key'>"created"</span>: <span class='json-num'>1772727002</span>,
+  <span class='json-key'>"model"</span>: <span class='json-str'>&quot;upstage/solar-10.7b-instruct&quot;</span>,
+  <span class='json-key'>"choices"</span>: [
+    {
+      <span class='json-key'>"index"</span>: <span class='json-num'>0</span>,
+      <span class='json-key'>"message"</span>: {
+        <span class='json-key'>"role"</span>: <span class='json-str'>&quot;assistant&quot;</span>,
+        <span class='json-key'>"content"</span>: <span class='json-str'>&quot;To find the product of 25 and 37, we can follow these steps:\n\n1. Starting with the right-most digits, multiply each digit of the first number (25) wit... (985 chars)&quot;</span>
+      },
+      <span class="hl-extra"><span class='json-key'>"logprobs"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
+      <span class='json-key'>"finish_reason"</span>: <span class='json-str'>&quot;stop&quot;</span>,
+      <span class="hl-extra"><span class='json-key'>"stop_reason"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>
+    }
+  ],
+  <span class='json-key'>"usage"</span>: {
+    <span class='json-key'>"prompt_tokens"</span>: <span class='json-num'>25</span>,
+    <span class='json-key'>"total_tokens"</span>: <span class='json-num'>358</span>,
+    <span class='json-key'>"completion_tokens"</span>: <span class='json-num'>333</span>
+  }
+}</code></pre>
+        </div>
+        <div class="panel normalized">
+          <div class="panel-label">Adapter-Normalized</div>
+          <pre><code>{
+  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;cmpl-81ee4acbb8ee4b3fb3c1f3d512efa8f9&quot;</span>,
+  <span class='json-key'>"object"</span>: <span class='json-str'>&quot;chat.completion&quot;</span>,
+  <span class='json-key'>"created"</span>: <span class='json-num'>1772727002</span>,
+  <span class='json-key'>"model"</span>: <span class='json-str'>&quot;upstage/solar-10.7b-instruct&quot;</span>,
+  <span class='json-key'>"choices"</span>: [
+    {
+      <span class='json-key'>"index"</span>: <span class='json-num'>0</span>,
+      <span class='json-key'>"message"</span>: {
+        <span class='json-key'>"role"</span>: <span class='json-str'>&quot;assistant&quot;</span>,
+        <span class='json-key'>"content"</span>: <span class='json-str'>&quot;To find the product of 25 and 37, we can follow these steps:\n\n1. Starting with the right-most digits, multiply each digit of the first number (25) wit... (985 chars)&quot;</span>
+      },
+      <span class='json-key'>"logprobs"</span>: <span class='json-null'>null</span>,
+      <span class='json-key'>"finish_reason"</span>: <span class='json-str'>&quot;stop&quot;</span>,
+      <span class='json-key'>"stop_reason"</span>: <span class='json-null'>null</span>
+    }
+  ],
+  <span class='json-key'>"usage"</span>: {
+    <span class='json-key'>"prompt_tokens"</span>: <span class='json-num'>25</span>,
+    <span class='json-key'>"total_tokens"</span>: <span class='json-num'>358</span>,
+    <span class='json-key'>"completion_tokens"</span>: <span class='json-num'>333</span>
+  }
+}</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="model-card" id="jamba-1.5-mini-instruct">
+      <div class="model-header">
+        <h3>ai21labs/jamba-1.5-mini-instruct</h3>
+        <div class="header-badges">
+          <span class="status-badge ok">OK</span>
+          <span class="count-badge fixed">1 fixed</span>
+          <span class="count-badge extra">14 extra fields</span>
+        </div>
+      </div>
+
+      <div class="deviations">
+        <h4>Deviations Found (15)</h4>
+        
+            <div class="dev-item fix-applied">
+              <div class="dev-label"><span class="badge" style="background:#fd7e14">NULL</span> prompt_tokens_details: null</div>
+              <div class="dev-arrow">&#8594;</div>
+              <div class="dev-fix">Field omitted</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: service_tier</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through (adapter preserves unknown fields)</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: system_fingerprint</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through (adapter preserves unknown fields)</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: prompt_logprobs</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through (adapter preserves unknown fields)</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: prompt_token_ids</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through (adapter preserves unknown fields)</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: kv_transfer_params</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through (adapter preserves unknown fields)</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: choices[].logprobs</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: choices[].stop_reason</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: choices[].token_ids</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: message.refusal</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: message.annotations</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: message.audio</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: message.function_call</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: message.tool_calls</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: message.reasoning</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through</div>
+            </div>
+      </div>
+
+      <div class="panels">
+        <div class="panel raw">
+          <div class="panel-label">Raw Nvidia Response</div>
+          <pre><code>{
+  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;chatcmpl-bd187fddc1fa3bdb&quot;</span>,
+  <span class='json-key'>"object"</span>: <span class='json-str'>&quot;chat.completion&quot;</span>,
+  <span class='json-key'>"created"</span>: <span class='json-num'>1772727015</span>,
+  <span class='json-key'>"model"</span>: <span class='json-str'>&quot;stg/ai21labs/jamba-1.5-mini-instruct&quot;</span>,
+  <span class='json-key'>"choices"</span>: [
+    {
+      <span class='json-key'>"index"</span>: <span class='json-num'>0</span>,
+      <span class='json-key'>"message"</span>: {
+        <span class='json-key'>"role"</span>: <span class='json-str'>&quot;assistant&quot;</span>,
+        <span class='json-key'>"content"</span>: <span class='json-str'>&quot; Sure! Let&#x27;s solve $25 \\times 37$ step by step.\n\n### Step 1: Prime Factorization\n\nWe can first find the prime factorization of the numbers involved.\n\n... (465 chars)&quot;</span>,
+        <span class="hl-extra"><span class='json-key'>"refusal"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
+        <span class="hl-extra"><span class='json-key'>"annotations"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
+        <span class="hl-extra"><span class='json-key'>"audio"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
+        <span class="hl-extra"><span class='json-key'>"function_call"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
+        <span class="hl-extra"><span class='json-key'>"tool_calls"</span>: <span class="hl-extra">[]</span></span>,
+        <span class="hl-extra"><span class='json-key'>"reasoning"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
+        <span class='json-key'>"reasoning_content"</span>: <span class='json-null'>null</span>
+      },
+      <span class="hl-extra"><span class='json-key'>"logprobs"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
+      <span class='json-key'>"finish_reason"</span>: <span class='json-str'>&quot;stop&quot;</span>,
+      <span class="hl-extra"><span class='json-key'>"stop_reason"</span>: <span class="hl-extra"><span class='json-num'>518</span></span></span>,
+      <span class="hl-extra"><span class='json-key'>"token_ids"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>
+    }
+  ],
+  <span class="hl-extra"><span class='json-key'>"service_tier"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
+  <span class="hl-extra"><span class='json-key'>"system_fingerprint"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
+  <span class='json-key'>"usage"</span>: {
+    <span class='json-key'>"prompt_tokens"</span>: <span class='json-num'>25</span>,
+    <span class='json-key'>"total_tokens"</span>: <span class='json-num'>206</span>,
+    <span class='json-key'>"completion_tokens"</span>: <span class='json-num'>181</span>,
+    <span class="hl-removed"><span class='json-key'>"prompt_tokens_details"</span>: <span class="hl-removed"><span class='json-null'>null</span></span></span>
+  },
+  <span class="hl-extra"><span class='json-key'>"prompt_logprobs"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
+  <span class="hl-extra"><span class='json-key'>"prompt_token_ids"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
+  <span class="hl-extra"><span class='json-key'>"kv_transfer_params"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>
+}</code></pre>
+        </div>
+        <div class="panel normalized">
+          <div class="panel-label">Adapter-Normalized</div>
+          <pre><code>{
+  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;chatcmpl-bd187fddc1fa3bdb&quot;</span>,
+  <span class='json-key'>"object"</span>: <span class='json-str'>&quot;chat.completion&quot;</span>,
+  <span class='json-key'>"created"</span>: <span class='json-num'>1772727015</span>,
+  <span class='json-key'>"model"</span>: <span class='json-str'>&quot;stg/ai21labs/jamba-1.5-mini-instruct&quot;</span>,
+  <span class='json-key'>"choices"</span>: [
+    {
+      <span class='json-key'>"index"</span>: <span class='json-num'>0</span>,
+      <span class='json-key'>"message"</span>: {
+        <span class='json-key'>"role"</span>: <span class='json-str'>&quot;assistant&quot;</span>,
+        <span class='json-key'>"content"</span>: <span class='json-str'>&quot; Sure! Let&#x27;s solve $25 \\times 37$ step by step.\n\n### Step 1: Prime Factorization\n\nWe can first find the prime factorization of the numbers involved.\n\n... (465 chars)&quot;</span>,
+        <span class='json-key'>"refusal"</span>: <span class='json-null'>null</span>,
+        <span class='json-key'>"annotations"</span>: <span class='json-null'>null</span>,
+        <span class='json-key'>"audio"</span>: <span class='json-null'>null</span>,
+        <span class='json-key'>"function_call"</span>: <span class='json-null'>null</span>,
+        <span class='json-key'>"tool_calls"</span>: [],
+        <span class='json-key'>"reasoning"</span>: <span class='json-null'>null</span>
+      },
+      <span class='json-key'>"logprobs"</span>: <span class='json-null'>null</span>,
+      <span class='json-key'>"finish_reason"</span>: <span class='json-str'>&quot;stop&quot;</span>,
+      <span class='json-key'>"stop_reason"</span>: <span class='json-num'>518</span>,
+      <span class='json-key'>"token_ids"</span>: <span class='json-null'>null</span>
+    }
+  ],
+  <span class='json-key'>"service_tier"</span>: <span class='json-null'>null</span>,
+  <span class='json-key'>"system_fingerprint"</span>: <span class='json-null'>null</span>,
+  <span class='json-key'>"usage"</span>: {
+    <span class='json-key'>"prompt_tokens"</span>: <span class='json-num'>25</span>,
+    <span class='json-key'>"total_tokens"</span>: <span class='json-num'>206</span>,
+    <span class='json-key'>"completion_tokens"</span>: <span class='json-num'>181</span>
+  },
+  <span class='json-key'>"prompt_logprobs"</span>: <span class='json-null'>null</span>,
+  <span class='json-key'>"prompt_token_ids"</span>: <span class='json-null'>null</span>,
+  <span class='json-key'>"kv_transfer_params"</span>: <span class='json-null'>null</span>
+}</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="model-card" id="chatglm3-6b">
+      <div class="model-header">
+        <h3>thudm/chatglm3-6b</h3>
+        <div class="header-badges">
+          <span class="status-badge ok">OK</span>
+          <span class="count-badge fixed">1 fixed</span>
+          <span class="count-badge extra">11 extra fields</span>
+        </div>
+      </div>
+
+      <div class="deviations">
+        <h4>Deviations Found (12)</h4>
+        
+            <div class="dev-item fix-applied">
+              <div class="dev-label"><span class="badge" style="background:#fd7e14">NULL</span> prompt_tokens_details: null</div>
+              <div class="dev-arrow">&#8594;</div>
+              <div class="dev-fix">Field omitted</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: service_tier</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through (adapter preserves unknown fields)</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: system_fingerprint</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through (adapter preserves unknown fields)</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: prompt_logprobs</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through (adapter preserves unknown fields)</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: kv_transfer_params</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through (adapter preserves unknown fields)</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: choices[].logprobs</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: choices[].stop_reason</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: message.refusal</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: message.annotations</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: message.audio</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: message.function_call</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through</div>
+            </div>
+            <div class="dev-item fix-passthrough">
+              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: message.tool_calls</div>
+              <div class="dev-arrow"></div>
+              <div class="dev-fix">Passed through</div>
+            </div>
+      </div>
+
+      <div class="panels">
+        <div class="panel raw">
+          <div class="panel-label">Raw Nvidia Response</div>
+          <pre><code>{
+  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;chatcmpl-e2e81ad9ca544be39cd8508ff168f0e0&quot;</span>,
+  <span class='json-key'>"object"</span>: <span class='json-str'>&quot;chat.completion&quot;</span>,
+  <span class='json-key'>"created"</span>: <span class='json-num'>1772727020</span>,
+  <span class='json-key'>"model"</span>: <span class='json-str'>&quot;thudm/chatglm3-6b&quot;</span>,
+  <span class='json-key'>"choices"</span>: [
+    {
+      <span class='json-key'>"index"</span>: <span class='json-num'>0</span>,
+      <span class='json-key'>"message"</span>: {
+        <span class='json-key'>"role"</span>: <span class='json-str'>&quot;assistant&quot;</span>,
+        <span class='json-key'>"content"</span>: <span class='json-str'>&quot; We can start by multiplying the ones digit of 25 by the ones digit of 37, which is 5 * 7 = 35. We then multiply the tens digit of 25 by the ones digi... (365 chars)&quot;</span>,
+        <span class="hl-extra"><span class='json-key'>"refusal"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
+        <span class="hl-extra"><span class='json-key'>"annotations"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
+        <span class="hl-extra"><span class='json-key'>"audio"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
+        <span class="hl-extra"><span class='json-key'>"function_call"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
+        <span class="hl-extra"><span class='json-key'>"tool_calls"</span>: <span class="hl-extra">[]</span></span>,
+        <span class='json-key'>"reasoning_content"</span>: <span class='json-null'>null</span>
+      },
+      <span class="hl-extra"><span class='json-key'>"logprobs"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
+      <span class='json-key'>"finish_reason"</span>: <span class='json-str'>&quot;stop&quot;</span>,
+      <span class="hl-extra"><span class='json-key'>"stop_reason"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>
+    }
+  ],
+  <span class="hl-extra"><span class='json-key'>"service_tier"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
+  <span class="hl-extra"><span class='json-key'>"system_fingerprint"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
+  <span class='json-key'>"usage"</span>: {
+    <span class='json-key'>"prompt_tokens"</span>: <span class='json-num'>26</span>,
+    <span class='json-key'>"total_tokens"</span>: <span class='json-num'>167</span>,
+    <span class='json-key'>"completion_tokens"</span>: <span class='json-num'>141</span>,
+    <span class="hl-removed"><span class='json-key'>"prompt_tokens_details"</span>: <span class="hl-removed"><span class='json-null'>null</span></span></span>
+  },
+  <span class="hl-extra"><span class='json-key'>"prompt_logprobs"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
+  <span class="hl-extra"><span class='json-key'>"kv_transfer_params"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>
+}</code></pre>
+        </div>
+        <div class="panel normalized">
+          <div class="panel-label">Adapter-Normalized</div>
+          <pre><code>{
+  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;chatcmpl-e2e81ad9ca544be39cd8508ff168f0e0&quot;</span>,
+  <span class='json-key'>"object"</span>: <span class='json-str'>&quot;chat.completion&quot;</span>,
+  <span class='json-key'>"created"</span>: <span class='json-num'>1772727020</span>,
+  <span class='json-key'>"model"</span>: <span class='json-str'>&quot;thudm/chatglm3-6b&quot;</span>,
+  <span class='json-key'>"choices"</span>: [
+    {
+      <span class='json-key'>"index"</span>: <span class='json-num'>0</span>,
+      <span class='json-key'>"message"</span>: {
+        <span class='json-key'>"role"</span>: <span class='json-str'>&quot;assistant&quot;</span>,
+        <span class='json-key'>"content"</span>: <span class='json-str'>&quot; We can start by multiplying the ones digit of 25 by the ones digit of 37, which is 5 * 7 = 35. We then multiply the tens digit of 25 by the ones digi... (365 chars)&quot;</span>,
+        <span class='json-key'>"refusal"</span>: <span class='json-null'>null</span>,
+        <span class='json-key'>"annotations"</span>: <span class='json-null'>null</span>,
+        <span class='json-key'>"audio"</span>: <span class='json-null'>null</span>,
+        <span class='json-key'>"function_call"</span>: <span class='json-null'>null</span>,
+        <span class='json-key'>"tool_calls"</span>: []
+      },
+      <span class='json-key'>"logprobs"</span>: <span class='json-null'>null</span>,
+      <span class='json-key'>"finish_reason"</span>: <span class='json-str'>&quot;stop&quot;</span>,
+      <span class='json-key'>"stop_reason"</span>: <span class='json-null'>null</span>
+    }
+  ],
+  <span class='json-key'>"service_tier"</span>: <span class='json-null'>null</span>,
+  <span class='json-key'>"system_fingerprint"</span>: <span class='json-null'>null</span>,
+  <span class='json-key'>"usage"</span>: {
+    <span class='json-key'>"prompt_tokens"</span>: <span class='json-num'>26</span>,
+    <span class='json-key'>"total_tokens"</span>: <span class='json-num'>167</span>,
+    <span class='json-key'>"completion_tokens"</span>: <span class='json-num'>141</span>
+  },
+  <span class='json-key'>"prompt_logprobs"</span>: <span class='json-null'>null</span>,
+  <span class='json-key'>"kv_transfer_params"</span>: <span class='json-null'>null</span>
+}</code></pre>
+        </div>
+      </div>
+    </div>
+
+<footer>
+  Open Layer v0.1 &middot; Adapter: NvidiaAdapter &middot; Provider: Nvidia NIM &middot;
+  <a href="https://github.com/adityonugrohoid/open-layer" style="color:var(--blue)">GitHub</a>
+</footer>
+
+</div>
+</body>
+</html>
