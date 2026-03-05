@@ -55,7 +55,6 @@ async def call_raw_api(model: str) -> dict:
             json={
                 "model": model,
                 "messages": [{"role": "user", "content": PROMPT}],
-                "max_tokens": 1024,
             },
         )
         resp.raise_for_status()
