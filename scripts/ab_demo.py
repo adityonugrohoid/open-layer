@@ -37,6 +37,7 @@ PROMPT = "What is 25 * 37? Think step by step."
 
 # Thinking models to try in order (first available wins)
 THINKING_MODELS = [
+    "nvidia/llama-3.1-nemotron-ultra-253b-v1",
     "deepseek-ai/deepseek-r1-distill-qwen-14b",
     "deepseek-ai/deepseek-r1-distill-llama-8b",
 ]
@@ -108,10 +109,14 @@ def side_by_side(
 
 def display_comparison(console: Console, model: str, raw: dict, normalized: dict) -> None:
     """Display rich panels comparing raw vs normalized responses."""
-    raw_content = raw["choices"][0]["message"].get("content", "")
+    raw_msg = raw["choices"][0]["message"]
+    raw_content = raw_msg.get("content", "")
+    raw_reasoning = raw_msg.get("reasoning_content")
     norm_msg = normalized["choices"][0]["message"]
     raw_usage = raw.get("usage", {})
     has_think_tags = "<think>" in raw_content
+    has_reasoning_content = bool(raw_reasoning)
+    has_thinking = has_think_tags or has_reasoning_content
     has_reasoning_tokens = "reasoning_tokens" in raw_usage
     has_null_prompt_details = (
         "prompt_tokens_details" in raw_usage
@@ -130,12 +135,24 @@ def display_comparison(console: Console, model: str, raw: dict, normalized: dict
     console.rule("[bold yellow]1. Thinking Content Extraction[/]")
     console.print()
 
-    if has_think_tags:
-        # Extract the thinking portion for display
+    if has_reasoning_content:
+        # reasoning_content field pattern (nemotron-ultra style)
+        raw_display = {
+            "message.content": raw_content[:200],
+            "message.reasoning_content": raw_reasoning[:200] + "...",
+            "message.thinking": None,
+        }
+        norm_display = {
+            "message.content": (norm_msg.get("content") or "")[:200],
+            "message.reasoning_content": "REMOVED",
+            "message.thinking.content": raw_reasoning[:200] + "...",
+        }
+    elif has_think_tags:
+        # <think> tag pattern (R1-distill style)
         think_end = raw_content.find("</think>")
         if think_end != -1:
-            think_text = raw_content[7:think_end].strip()  # skip <think>
-            answer_text = raw_content[think_end + 8:].strip()  # skip </think>
+            think_text = raw_content[7:think_end].strip()
+            answer_text = raw_content[think_end + 8:].strip()
         else:
             think_text = raw_content[7:].strip()
             answer_text = ""
@@ -161,7 +178,16 @@ def display_comparison(console: Console, model: str, raw: dict, normalized: dict
     side_by_side(console, "Raw Nvidia Response", raw_display, "Adapter-Normalized", norm_display)
     console.print()
 
-    if has_think_tags:
+    if has_reasoning_content:
+        console.print(
+            "  [yellow]>[/] Raw: [red]message.reasoning_content[/] (non-spec field)"
+        )
+        console.print(
+            "  [yellow]>[/] Normalized: moved to [green]message.thinking.content[/], "
+            "reasoning_content removed"
+        )
+        console.print()
+    elif has_think_tags:
         console.print(
             "  [yellow]>[/] Raw: [red]<think>...</think>[/] mixed into message.content"
         )
@@ -222,7 +248,18 @@ def display_comparison(console: Console, model: str, raw: dict, normalized: dict
     table.add_column("Before (Raw)", style="red")
     table.add_column("After (Normalized)", style="green")
 
-    if has_think_tags:
+    if has_reasoning_content:
+        table.add_row(
+            "Thinking extraction",
+            "message.reasoning_content (non-spec)",
+            "message.thinking.content",
+        )
+        table.add_row(
+            "Field cleanup",
+            "reasoning_content on message",
+            "Field removed",
+        )
+    elif has_think_tags:
         table.add_row(
             "Thinking extraction",
             "<think>...</think> in content",
