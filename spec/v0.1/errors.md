@@ -126,27 +126,27 @@ Clients MUST:
 
 All four providers return errors as a JSON object with an `error` field, but the internal structure varies:
 
-| Standard | Groq | DeepSeek | Qwen | Mistral |
+| Standard | Groq | DeepSeek | Nvidia | Mistral |
 |----------|------|----------|------|---------|
-| `error.type` | `error.type` | `error.type` | `error.code` (string) | `error.type` |
-| `error.message` | `error.message` | `error.message` | `error.message` | `error.message` |
+| `error.type` | `error.type` | `error.type` | `error.type` or plain `error` string | `error.type` |
+| `error.message` | `error.message` | `error.message` | `error.message` (or inline in `error` string) | `error.message` |
 | `error.code` | `error.code` | — | — | — |
-| `error.param` | `error.param` | — | `error.param` | — |
+| `error.param` | `error.param` | — | — | — |
 
 ### Rate Limit Headers
 
-| Standard | Groq | DeepSeek | Qwen | Mistral |
+| Standard | Groq | DeepSeek | Nvidia | Mistral |
 |----------|------|----------|------|---------|
-| `x-ratelimit-limit-requests` | ✅ | — | Varies | ✅ |
-| `x-ratelimit-remaining-requests` | ✅ | — | Varies | ✅ |
-| `x-ratelimit-reset-requests` | ✅ | — | Varies | ✅ |
-| `retry-after` | ✅ | ✅ | Varies | ✅ |
+| `x-ratelimit-limit-requests` | ✅ | — | ✅ | ✅ |
+| `x-ratelimit-remaining-requests` | ✅ | — | ✅ | ✅ |
+| `x-ratelimit-reset-requests` | ✅ | — | ✅ | ✅ |
+| `retry-after` | ✅ | ✅ | ✅ | ✅ |
 
 ### Adapter Notes
 
 - **Groq:** Error format closely matches Open Layer standard. Minimal translation needed.
 - **DeepSeek:** Maps `finish_reason: "insufficient_system_resource"` to `overloaded_error` (503). Error response format matches standard.
-- **Qwen:** Uses `error.code` as a string where Open Layer uses `error.type`. Adapters MUST map Qwen's `error.code` values to the standard `error.type` values.
+- **Nvidia:** Some errors return a plain `{"error": "string"}` instead of the structured object format. Adapters MUST normalize these into `{"error": {"type": "server_error", "message": "<the string>"}}`. Model deprecation/EOL returns HTTP 410 — adapters SHOULD map this to `not_found_error`.
 - **Mistral:** Error format closely matches Open Layer standard. Minimal translation needed.
 
 ## Examples

@@ -115,24 +115,24 @@ No provider currently implements a `/v1/capabilities` endpoint. This is a new en
 |----------|--------------------|-----------------------|--------------------------|----------------------|----------------------------|
 | Groq | 2 | `true` (select models) | `true` (via `reasoning_effort`) | `true` | `true` |
 | DeepSeek | 2 | `true` (deepseek-reasoner) | `false` | `true` | `true` |
-| Qwen | 2 | `true` (select models) | `true` (via `thinking_budget`) | `true` | `true` |
+| Nvidia | 2 | `true` (R1-distill, DeepSeek V3.x, QwQ, Nemotron reasoning models) | `false` | `true` | `true` |
 | Mistral | 2 | `true` (Magistral models) | `false` | `true` | `true` (automatic) |
 
 ### Per-Model Overrides
 
-Adapters SHOULD populate the `models` array. Example for DeepSeek:
+Adapters SHOULD populate the `models` array. Example for Nvidia:
 
 ```json
 {
   "models": [
     {
-      "id": "deepseek-reasoner",
+      "id": "deepseek-ai/deepseek-r1-distill-qwen-14b",
       "features": {
         "thinking": {"supported": true, "budget_control": false}
       }
     },
     {
-      "id": "deepseek-chat",
+      "id": "meta/llama-3.3-70b-instruct",
       "features": {
         "thinking": {"supported": false}
       }
@@ -161,13 +161,13 @@ Adapters SHOULD populate the `models` array. Example for DeepSeek:
   },
   "models": [
     {
-      "id": "qwen-plus",
+      "id": "deepseek-ai/deepseek-v3.1",
       "features": {
-        "thinking": {"supported": true, "budget_control": true}
+        "thinking": {"supported": true, "budget_control": false}
       }
     },
     {
-      "id": "qwen-turbo",
+      "id": "meta/llama-3.3-70b-instruct",
       "features": {
         "thinking": {"supported": false}
       }

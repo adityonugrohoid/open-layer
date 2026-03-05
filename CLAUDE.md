@@ -16,7 +16,7 @@ Open Layer is a universal open standard (specification) for LLM inference I/O �
 [Application] → Open Layer SDK → [Conformant Provider API]
                                    ├── Groq
                                    ├── DeepSeek
-                                   ├── Alibaba Qwen
+                                   ├── Nvidia (NIM)
                                    ├── Mistral
                                    └── Cerebras
 ```
@@ -39,7 +39,7 @@ open-layer/
 ├── adapters/           # Provider adapter shims
 │   ├── groq/
 │   ├── deepseek/
-│   └── alibaba-qwen/
+│   └── nvidia/
 └── docs/
     └── provider-fragmentation.md  # Provider research (source of truth)
 ```
@@ -48,7 +48,7 @@ open-layer/
 - [x] Spec: all 6 sections + 8 JSON schemas (Draft)
 - [ ] Conformance test suite (pytest CLI runner)
 - [ ] Python reference SDK
-- [ ] Adapters: Groq, DeepSeek, Alibaba Qwen
+- [ ] Adapters: Groq, DeepSeek, Nvidia (NIM)
 
 ## Key Spec Decisions
 - **Thinking request:** `thinking.enabled` (bool) + `thinking.budget_tokens` (int, optional)
@@ -61,12 +61,12 @@ open-layer/
 - **Versioning:** `0.1-draft` for now, date-based (YYYY-MM-DD) at 1.0
 
 ## Provider Mapping (quick ref)
-| Feature | Groq | DeepSeek | Qwen | Mistral |
-|---------|------|----------|------|---------|
-| Thinking field | `reasoning` | `reasoning_content` | `reasoning_content` | typed content blocks |
-| Budget param | `reasoning_effort` | N/A (max_tokens) | `thinking_budget` | N/A |
-| Cache reporting | — | `prompt_cache_hit_tokens` (top-level) | `prompt_tokens_details.cached_tokens` | — |
-| Reasoning usage | — | `completion_tokens_details.reasoning_tokens` | `completion_tokens_details.reasoning_tokens` | — |
+| Feature | Groq | DeepSeek | Nvidia | Mistral |
+|---------|------|----------|--------|---------|
+| Thinking field | `reasoning` | `reasoning_content` | `reasoning_content` (or `<think>` tags for R1-distill) | typed content blocks |
+| Budget param | `reasoning_effort` | N/A (max_tokens) | N/A | N/A |
+| Cache reporting | — | `prompt_cache_hit_tokens` (top-level) | `prompt_tokens_details` (null when N/A) | — |
+| Reasoning usage | — | `completion_tokens_details.reasoning_tokens` | `usage.reasoning_tokens` (top-level) | — |
 | Input thinking | OK | MUST strip (400 error) | OK | OK |
 
 ## Key Patterns
@@ -92,7 +92,7 @@ python3 -c "import json, glob; [print(f'OK: {f}') for f in sorted(glob.glob('spe
 
 ## Important Notes
 - This is a SPEC project, not a service or library
-- Target open model providers first (Groq, DeepSeek, Alibaba, Mistral)
+- Target open model providers first (Groq, DeepSeek, Nvidia, Mistral)
 - Frontier models (OpenAI, Anthropic) welcome but not required
 - Apache 2.0 licensed
 - Concept doc: ~/projects/brainstorming/concepts/open-layer.md

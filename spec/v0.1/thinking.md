@@ -127,16 +127,16 @@ When replaying an assistant message that included thinking in a multi-turn conve
 
 ### Enable Parameter
 
-| Standard | Groq | DeepSeek | Qwen | Mistral |
-|----------|------|----------|------|---------|
-| `thinking.enabled: true` | `reasoning_format: "parsed"` | `thinking: {"type": "enabled"}` | `enable_thinking: true` (via `extra_body`) | `prompt_mode: "reasoning"` |
-| `thinking.enabled: false` | `reasoning_format: "none"` (or omit) | Omit `thinking` param | `enable_thinking: false` | Omit `prompt_mode` |
+| Standard | Groq | DeepSeek | Nvidia | Mistral |
+|----------|------|----------|--------|---------|
+| `thinking.enabled: true` | `reasoning_format: "parsed"` | `thinking: {"type": "enabled"}` | Use reasoning model (e.g. `deepseek-ai/deepseek-r1-distill-*`) or `chat_template_kwargs: {"enable_thinking": true}` | `prompt_mode: "reasoning"` |
+| `thinking.enabled: false` | `reasoning_format: "none"` (or omit) | Omit `thinking` param | Use non-reasoning model or omit `chat_template_kwargs` | Omit `prompt_mode` |
 
 ### Budget Parameter
 
-| Standard | Groq | DeepSeek | Qwen | Mistral |
-|----------|------|----------|------|---------|
-| `thinking.budget_tokens: N` | `reasoning_effort` (map to `"low"`, `"medium"`, `"high"`) | Not supported (uses `max_tokens`) | `thinking_budget: N` | Not supported (ignore) |
+| Standard | Groq | DeepSeek | Nvidia | Mistral |
+|----------|------|----------|--------|---------|
+| `thinking.budget_tokens: N` | `reasoning_effort` (map to `"low"`, `"medium"`, `"high"`) | Not supported (uses `max_tokens`) | Not supported (ignore) | Not supported (ignore) |
 
 **Budget mapping for Groq:** Since Groq uses effort levels rather than token counts, adapters SHOULD map `budget_tokens` as follows:
 
@@ -150,14 +150,14 @@ These thresholds are recommendations. Adapters MAY use different mappings.
 
 ### Response Field
 
-| Standard | Groq | DeepSeek | Qwen | Mistral |
-|----------|------|----------|------|---------|
-| `message.thinking.content` | `message.reasoning` | `message.reasoning_content` | `message.reasoning_content` | `message.content[].thinking[].text` (flattened) |
+| Standard | Groq | DeepSeek | Nvidia | Mistral |
+|----------|------|----------|--------|---------|
+| `message.thinking.content` | `message.reasoning` | `message.reasoning_content` | `message.reasoning_content` (or `<think>` tags in `content` for R1-distill models) | `message.content[].thinking[].text` (flattened) |
 
 ### Streaming Delta Field
 
-| Standard | Groq | DeepSeek | Qwen | Mistral |
-|----------|------|----------|------|---------|
+| Standard | Groq | DeepSeek | Nvidia | Mistral |
+|----------|------|----------|--------|---------|
 | `delta.thinking.content` | `delta.reasoning` | `delta.reasoning_content` | `delta.reasoning_content` | `delta.content[].thinking[].text` (flattened) |
 
 ### Adapter Notes
@@ -166,7 +166,10 @@ These thresholds are recommendations. Adapters MAY use different mappings.
   1. Extract text from all blocks with `"type": "thinking"` and concatenate into `thinking.content`.
   2. Extract text from all blocks with `"type": "text"` and concatenate into `content`.
 - **DeepSeek:** Adapters MUST strip `reasoning_content` from input assistant messages to avoid 400 errors.
-- **Qwen:** Uses `extra_body` for `enable_thinking` and `thinking_budget` — these are not top-level OpenAI-compatible params.
+- **Nvidia:** Two response patterns exist:
+  1. Models like `deepseek-ai/deepseek-v3.1` return `reasoning_content` as a separate field (same as DeepSeek native).
+  2. R1-distill models embed thinking in `<think>...</think>` tags within `content`. Adapters MUST parse these tags, extract the thinking text into `thinking.content`, and strip the tags from `content`.
+  3. Non-reasoning models return `reasoning_content: null` and `reasoning: null` — adapters MUST strip these null fields.
 
 ## Examples
 
