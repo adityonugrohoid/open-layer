@@ -8,8 +8,9 @@ from typing import Any
 import httpx
 import pytest
 
-from tests.conftest import ProviderConfig
+from tests.models import ModelConfig
 from tests.suite.helpers.schema import validate
+from tests.suite.helpers.throttle import get_throttle
 
 pytestmark = pytest.mark.level1
 
@@ -17,6 +18,7 @@ pytestmark = pytest.mark.level1
 # --- Helpers ---
 
 async def post_chat(client: httpx.AsyncClient, payload: dict[str, Any]) -> httpx.Response:
+    await get_throttle().wait()
     return await client.post("/chat/completions", json=payload)
 
 
@@ -87,9 +89,9 @@ async def test_finish_reason_stop(client: httpx.AsyncClient, chat_payload: dict)
     assert reason == "stop", f"Expected 'stop', got {reason!r}"
 
 
-async def test_finish_reason_length(client: httpx.AsyncClient, provider_config: ProviderConfig) -> None:
+async def test_finish_reason_length(client: httpx.AsyncClient, model_config: ModelConfig) -> None:
     payload = {
-        "model": provider_config.model,
+        "model": model_config.id,
         "messages": [{"role": "user", "content": "Write a very long essay about the history of mathematics."}],
         "max_tokens": 5,
     }
@@ -98,9 +100,9 @@ async def test_finish_reason_length(client: httpx.AsyncClient, provider_config: 
     assert reason == "length", f"Expected 'length' with max_tokens=5, got {reason!r}"
 
 
-async def test_system_role_supported(client: httpx.AsyncClient, provider_config: ProviderConfig) -> None:
+async def test_system_role_supported(client: httpx.AsyncClient, model_config: ModelConfig) -> None:
     payload = {
-        "model": provider_config.model,
+        "model": model_config.id,
         "messages": [
             {"role": "system", "content": "You are a helpful assistant."},
             {"role": "user", "content": "Say hi."},
@@ -116,9 +118,9 @@ async def test_user_role_supported(client: httpx.AsyncClient, chat_payload: dict
     assert resp.status_code == 200
 
 
-async def test_assistant_role_in_multiturn(client: httpx.AsyncClient, provider_config: ProviderConfig) -> None:
+async def test_assistant_role_in_multiturn(client: httpx.AsyncClient, model_config: ModelConfig) -> None:
     payload = {
-        "model": provider_config.model,
+        "model": model_config.id,
         "messages": [
             {"role": "user", "content": "Say hi."},
             {"role": "assistant", "content": "Hi!"},
@@ -142,9 +144,9 @@ async def test_top_p_parameter(client: httpx.AsyncClient, chat_payload: dict) ->
     assert resp.status_code == 200, f"top_p=0.9 rejected: {resp.text}"
 
 
-async def test_max_tokens_parameter(client: httpx.AsyncClient, provider_config: ProviderConfig) -> None:
+async def test_max_tokens_parameter(client: httpx.AsyncClient, model_config: ModelConfig) -> None:
     payload = {
-        "model": provider_config.model,
+        "model": model_config.id,
         "messages": [{"role": "user", "content": "Write a long story."}],
         "max_tokens": 10,
     }

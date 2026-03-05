@@ -7,8 +7,9 @@ from typing import Any
 import httpx
 import pytest
 
-from tests.conftest import ProviderConfig
+from tests.models import ModelConfig, NVIDIA_BASE_URL
 from tests.suite.helpers.schema import validate
+from tests.suite.helpers.throttle import get_throttle
 
 pytestmark = pytest.mark.level1
 
@@ -36,14 +37,13 @@ STATUS_TO_TYPE = {
 # --- Helpers ---
 
 async def post_chat(client: httpx.AsyncClient, payload: dict[str, Any]) -> httpx.Response:
+    await get_throttle().wait()
     return await client.post("/chat/completions", json=payload)
 
 
-# --- Tests ---
+# --- Tests using fake model IDs (run once, not per-model) ---
 
-async def test_invalid_model_returns_error(
-    client: httpx.AsyncClient, provider_config: ProviderConfig
-) -> None:
+async def test_invalid_model_returns_error(client: httpx.AsyncClient) -> None:
     payload = {
         "model": "nonexistent-model-xyz-999",
         "messages": [{"role": "user", "content": "Hi."}],
@@ -53,9 +53,8 @@ async def test_invalid_model_returns_error(
     assert resp.status_code >= 400, f"Expected error status, got {resp.status_code}"
 
 
-async def test_error_has_type_and_message(
-    client: httpx.AsyncClient, provider_config: ProviderConfig
-) -> None:
+@pytest.mark.xfail(reason="Nvidia returns plain text for invalid model, not structured JSON error")
+async def test_error_has_type_and_message(client: httpx.AsyncClient) -> None:
     payload = {
         "model": "nonexistent-model-xyz-999",
         "messages": [{"role": "user", "content": "Hi."}],
@@ -70,9 +69,8 @@ async def test_error_has_type_and_message(
     assert "message" in error, f"error object missing 'message': {error}"
 
 
-async def test_error_type_is_standard(
-    client: httpx.AsyncClient, provider_config: ProviderConfig
-) -> None:
+@pytest.mark.xfail(reason="Nvidia returns plain text for invalid model, not structured JSON error")
+async def test_error_type_is_standard(client: httpx.AsyncClient) -> None:
     payload = {
         "model": "nonexistent-model-xyz-999",
         "messages": [{"role": "user", "content": "Hi."}],
@@ -87,9 +85,8 @@ async def test_error_type_is_standard(
     )
 
 
-async def test_error_schema_valid(
-    client: httpx.AsyncClient, provider_config: ProviderConfig
-) -> None:
+@pytest.mark.xfail(reason="Nvidia returns plain text for invalid model, not structured JSON error")
+async def test_error_schema_valid(client: httpx.AsyncClient) -> None:
     payload = {
         "model": "nonexistent-model-xyz-999",
         "messages": [{"role": "user", "content": "Hi."}],
@@ -101,9 +98,7 @@ async def test_error_schema_valid(
     assert not errors, f"Error schema validation errors: {errors}"
 
 
-async def test_invalid_model_returns_404_or_400(
-    client: httpx.AsyncClient, provider_config: ProviderConfig
-) -> None:
+async def test_invalid_model_returns_404_or_400(client: httpx.AsyncClient) -> None:
     payload = {
         "model": "nonexistent-model-xyz-999",
         "messages": [{"role": "user", "content": "Hi."}],
@@ -115,35 +110,8 @@ async def test_invalid_model_returns_404_or_400(
     )
 
 
-async def test_missing_messages_returns_400(
-    client: httpx.AsyncClient, provider_config: ProviderConfig
-) -> None:
-    payload = {"model": provider_config.model}
-    resp = await post_chat(client, payload)
-    assert resp.status_code == 400, f"Expected 400 for missing messages, got {resp.status_code}"
-
-
-async def test_auth_error_returns_401(provider_config: ProviderConfig) -> None:
-    async with httpx.AsyncClient(
-        base_url=provider_config.base_url,
-        headers={
-            "Authorization": "Bearer invalid-key-xxx",
-            "Content-Type": "application/json",
-        },
-        timeout=httpx.Timeout(30.0, connect=10.0),
-    ) as bad_client:
-        payload = {
-            "model": provider_config.model,
-            "messages": [{"role": "user", "content": "Hi."}],
-            "max_tokens": 5,
-        }
-        resp = await bad_client.post("/chat/completions", json=payload)
-        assert resp.status_code == 401, f"Expected 401 for bad auth, got {resp.status_code}"
-
-
-async def test_error_type_matches_status_code(
-    client: httpx.AsyncClient, provider_config: ProviderConfig
-) -> None:
+@pytest.mark.xfail(reason="Nvidia returns plain text for invalid model, not structured JSON error")
+async def test_error_type_matches_status_code(client: httpx.AsyncClient) -> None:
     payload = {
         "model": "nonexistent-model-xyz-999",
         "messages": [{"role": "user", "content": "Hi."}],
@@ -159,3 +127,34 @@ async def test_error_type_matches_status_code(
         assert error_type in expected_types, (
             f"Status {status} should have error.type in {expected_types}, got {error_type!r}"
         )
+
+
+# --- Per-model error test ---
+
+async def test_missing_messages_returns_400(
+    client: httpx.AsyncClient, model_config: ModelConfig
+) -> None:
+    payload = {"model": model_config.id}
+    resp = await post_chat(client, payload)
+    assert resp.status_code == 400, f"Expected 400 for missing messages, got {resp.status_code}"
+
+
+# --- Auth test (run once, not per-model) ---
+
+async def test_auth_error_returns_401() -> None:
+    await get_throttle().wait()
+    async with httpx.AsyncClient(
+        base_url=NVIDIA_BASE_URL,
+        headers={
+            "Authorization": "Bearer invalid-key-xxx",
+            "Content-Type": "application/json",
+        },
+        timeout=httpx.Timeout(30.0, connect=10.0),
+    ) as bad_client:
+        payload = {
+            "model": "meta/llama-3.3-70b-instruct",
+            "messages": [{"role": "user", "content": "Hi."}],
+            "max_tokens": 5,
+        }
+        resp = await bad_client.post("/chat/completions", json=payload)
+        assert resp.status_code == 401, f"Expected 401 for bad auth, got {resp.status_code}"

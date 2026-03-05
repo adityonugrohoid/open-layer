@@ -7,14 +7,17 @@ from typing import Any
 import httpx
 import pytest
 
-from tests.conftest import ProviderConfig, require_thinking
+from tests.models import ModelConfig
+from tests.conftest import require_thinking
 from tests.suite.helpers.sse import parse_sse_stream
 from tests.suite.helpers.schema import validate
+from tests.suite.helpers.throttle import get_throttle
 
 
 # --- Helpers ---
 
 async def get_response(client: httpx.AsyncClient, payload: dict[str, Any]) -> dict:
+    await get_throttle().wait()
     resp = await client.post("/chat/completions", json=payload)
     assert resp.status_code == 200, f"Expected 200, got {resp.status_code}: {resp.text}"
     return resp.json()
@@ -22,6 +25,7 @@ async def get_response(client: httpx.AsyncClient, payload: dict[str, Any]) -> di
 
 async def get_stream_usage(client: httpx.AsyncClient, payload: dict[str, Any]) -> dict | None:
     payload = {**payload, "stream": True, "stream_options": {"include_usage": True}}
+    await get_throttle().wait()
     async with client.stream("POST", "/chat/completions", json=payload) as resp:
         resp.raise_for_status()
         last_usage = None
@@ -83,9 +87,9 @@ async def test_streaming_usage_present(client: httpx.AsyncClient, chat_payload: 
 
 @pytest.mark.level2
 async def test_thinking_has_reasoning_tokens(
-    client: httpx.AsyncClient, thinking_payload: dict, provider_config: ProviderConfig
+    client: httpx.AsyncClient, thinking_payload: dict, model_config: ModelConfig
 ) -> None:
-    require_thinking(provider_config)
+    require_thinking(model_config)
     data = await get_response(client, thinking_payload)
     usage = data["usage"]
     details = usage.get("completion_tokens_details", {})
@@ -95,9 +99,9 @@ async def test_thinking_has_reasoning_tokens(
 
 @pytest.mark.level2
 async def test_reasoning_tokens_lte_completion_tokens(
-    client: httpx.AsyncClient, thinking_payload: dict, provider_config: ProviderConfig
+    client: httpx.AsyncClient, thinking_payload: dict, model_config: ModelConfig
 ) -> None:
-    require_thinking(provider_config)
+    require_thinking(model_config)
     data = await get_response(client, thinking_payload)
     usage = data["usage"]
     details = usage.get("completion_tokens_details", {})
@@ -109,11 +113,11 @@ async def test_reasoning_tokens_lte_completion_tokens(
 
 @pytest.mark.level2
 async def test_no_thinking_still_has_reasoning_tokens_zero(
-    client: httpx.AsyncClient, chat_payload: dict, provider_config: ProviderConfig
+    client: httpx.AsyncClient, chat_payload: dict, model_config: ModelConfig
 ) -> None:
-    require_thinking(provider_config)
-    # Use the thinking model but without enabling thinking
-    payload = {**chat_payload, "model": provider_config.thinking_model}
+    require_thinking(model_config)
+    # Use the thinking model but with a simple chat payload (no thinking param)
+    payload = {**chat_payload, "model": model_config.id}
     data = await get_response(client, payload)
     usage = data["usage"]
     details = usage.get("completion_tokens_details", {})
