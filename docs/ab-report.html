@@ -289,26 +289,26 @@
   <h1>Open Layer v0.1 &mdash; Adapter Conformance Report</h1>
   <p>
     Raw Nvidia NIM API responses vs. NvidiaAdapter-normalized output &middot;
-    12 models &middot; Generated 2026-03-05 16:10 UTC
+    12 models &middot; Generated 2026-03-05 16:26 UTC
   </p>
   <p>Prompt: <code>What is 25 * 37? Think step by step.</code></p>
 </header>
 
 <div class="stats">
   <div class="stat-card green">
-    <div class="stat-value">11</div>
+    <div class="stat-value">10</div>
     <div class="stat-label">Models OK</div>
   </div>
   <div class="stat-card red">
-    <div class="stat-value">1</div>
+    <div class="stat-value">2</div>
     <div class="stat-label">Errors</div>
   </div>
   <div class="stat-card orange">
-    <div class="stat-value">10</div>
+    <div class="stat-value">8</div>
     <div class="stat-label">Deviations Fixed</div>
   </div>
   <div class="stat-card purple">
-    <div class="stat-value">88</div>
+    <div class="stat-value">75</div>
     <div class="stat-label">Extra Fields Detected</div>
   </div>
 </div>
@@ -360,12 +360,10 @@
               <td>11</td>
               <td>null cleanup, thinking</td>
             </tr>
-            <tr>
-              <td><a href="#llama-3.1-nemotron-ultra-253b-v1">llama-3.1-nemotron-ultra-253b-v1</a></td>
-              <td><span class="status-badge ok">OK</span></td>
-              <td>2</td>
-              <td>13</td>
-              <td>null cleanup, thinking</td>
+            <tr class="summary-error">
+              <td>llama-3.1-nemotron-ultra-253b-v1</td>
+              <td><span class="status-badge error">ERROR</span></td>
+              <td>-</td><td>-</td><td>-</td>
             </tr>
             <tr>
               <td><a href="#nemotron-mini-4b-instruct">nemotron-mini-4b-instruct</a></td>
@@ -512,16 +510,16 @@
         <div class="panel raw">
           <div class="panel-label">Raw Nvidia Response</div>
           <pre><code>{
-  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;chatcmpl-921539eca3e1872f&quot;</span>,
+  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;chatcmpl-beffb386d07d04ba&quot;</span>,
   <span class='json-key'>"object"</span>: <span class='json-str'>&quot;chat.completion&quot;</span>,
-  <span class='json-key'>"created"</span>: <span class='json-num'>1772726753</span>,
+  <span class='json-key'>"created"</span>: <span class='json-num'>1772727894</span>,
   <span class='json-key'>"model"</span>: <span class='json-str'>&quot;meta/llama-3.3-70b-instruct&quot;</span>,
   <span class='json-key'>"choices"</span>: [
     {
       <span class='json-key'>"index"</span>: <span class='json-num'>0</span>,
       <span class='json-key'>"message"</span>: {
         <span class='json-key'>"role"</span>: <span class='json-str'>&quot;assistant&quot;</span>,
-        <span class='json-key'>"content"</span>: <span class='json-str'>&quot;To calculate 25 * 37, I&#x27;ll break it down step by step:\n\n1. Multiply 25 by 30: 25 * 30 = 750\n2. Multiply 25 by 7: 25 * 7 = 175\n3. Add the results from ... (200 chars)&quot;</span>,
+        <span class='json-key'>"content"</span>: <span class='json-str'>&quot;To find the product of 25 and 37, I&#x27;ll multiply the numbers step by step.\n\nFirst, I&#x27;ll multiply 25 by 30:\n25 * 30 = 750\n\nThen, I&#x27;ll multiply 25 by 7:\n... (239 chars)&quot;</span>,
         <span class="hl-extra"><span class='json-key'>"refusal"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
         <span class="hl-extra"><span class='json-key'>"annotations"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
         <span class="hl-extra"><span class='json-key'>"audio"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
@@ -540,8 +538,8 @@
   <span class="hl-extra"><span class='json-key'>"system_fingerprint"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
   <span class='json-key'>"usage"</span>: {
     <span class='json-key'>"prompt_tokens"</span>: <span class='json-num'>48</span>,
-    <span class='json-key'>"total_tokens"</span>: <span class='json-num'>135</span>,
-    <span class='json-key'>"completion_tokens"</span>: <span class='json-num'>87</span>,
+    <span class='json-key'>"total_tokens"</span>: <span class='json-num'>136</span>,
+    <span class='json-key'>"completion_tokens"</span>: <span class='json-num'>88</span>,
     <span class="hl-removed"><span class='json-key'>"prompt_tokens_details"</span>: <span class="hl-removed"><span class='json-null'>null</span></span></span>
   },
   <span class="hl-extra"><span class='json-key'>"prompt_logprobs"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
@@ -552,16 +550,16 @@
         <div class="panel normalized">
           <div class="panel-label">Adapter-Normalized</div>
           <pre><code>{
-  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;chatcmpl-921539eca3e1872f&quot;</span>,
+  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;chatcmpl-beffb386d07d04ba&quot;</span>,
   <span class='json-key'>"object"</span>: <span class='json-str'>&quot;chat.completion&quot;</span>,
-  <span class='json-key'>"created"</span>: <span class='json-num'>1772726753</span>,
+  <span class='json-key'>"created"</span>: <span class='json-num'>1772727894</span>,
   <span class='json-key'>"model"</span>: <span class='json-str'>&quot;meta/llama-3.3-70b-instruct&quot;</span>,
   <span class='json-key'>"choices"</span>: [
     {
       <span class='json-key'>"index"</span>: <span class='json-num'>0</span>,
       <span class='json-key'>"message"</span>: {
         <span class='json-key'>"role"</span>: <span class='json-str'>&quot;assistant&quot;</span>,
-        <span class='json-key'>"content"</span>: <span class='json-str'>&quot;To calculate 25 * 37, I&#x27;ll break it down step by step:\n\n1. Multiply 25 by 30: 25 * 30 = 750\n2. Multiply 25 by 7: 25 * 7 = 175\n3. Add the results from ... (200 chars)&quot;</span>,
+        <span class='json-key'>"content"</span>: <span class='json-str'>&quot;To find the product of 25 and 37, I&#x27;ll multiply the numbers step by step.\n\nFirst, I&#x27;ll multiply 25 by 30:\n25 * 30 = 750\n\nThen, I&#x27;ll multiply 25 by 7:\n... (239 chars)&quot;</span>,
         <span class='json-key'>"refusal"</span>: <span class='json-null'>null</span>,
         <span class='json-key'>"annotations"</span>: <span class='json-null'>null</span>,
         <span class='json-key'>"audio"</span>: <span class='json-null'>null</span>,
@@ -579,8 +577,8 @@
   <span class='json-key'>"system_fingerprint"</span>: <span class='json-null'>null</span>,
   <span class='json-key'>"usage"</span>: {
     <span class='json-key'>"prompt_tokens"</span>: <span class='json-num'>48</span>,
-    <span class='json-key'>"total_tokens"</span>: <span class='json-num'>135</span>,
-    <span class='json-key'>"completion_tokens"</span>: <span class='json-num'>87</span>
+    <span class='json-key'>"total_tokens"</span>: <span class='json-num'>136</span>,
+    <span class='json-key'>"completion_tokens"</span>: <span class='json-num'>88</span>
   },
   <span class='json-key'>"prompt_logprobs"</span>: <span class='json-null'>null</span>,
   <span class='json-key'>"prompt_token_ids"</span>: <span class='json-null'>null</span>,
@@ -669,16 +667,16 @@
         <div class="panel raw">
           <div class="panel-label">Raw Nvidia Response</div>
           <pre><code>{
-  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;chatcmpl-9735ce30f46d482694c3ef7392cf4111&quot;</span>,
+  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;chatcmpl-6fa73723cb8645098a96155a69e7b052&quot;</span>,
   <span class='json-key'>"object"</span>: <span class='json-str'>&quot;chat.completion&quot;</span>,
-  <span class='json-key'>"created"</span>: <span class='json-num'>1772726914</span>,
+  <span class='json-key'>"created"</span>: <span class='json-num'>1772727900</span>,
   <span class='json-key'>"model"</span>: <span class='json-str'>&quot;google/gemma-3-27b-it&quot;</span>,
   <span class='json-key'>"choices"</span>: [
     {
       <span class='json-key'>"index"</span>: <span class='json-num'>0</span>,
       <span class='json-key'>"message"</span>: {
         <span class='json-key'>"role"</span>: <span class='json-str'>&quot;assistant&quot;</span>,
-        <span class='json-key'>"content"</span>: <span class='json-str'>&quot;Okay, let&#x27;s calculate 25 * 37 step by step:\n\n**1. Break down 37:**\n\nWe can think of 37 as (30 + 7).\n\n**2. Distribute the 25:**\n\nNow we can multiply 25... (397 chars)&quot;</span>,
+        <span class='json-key'>"content"</span>: <span class='json-str'>&quot;Okay, let&#x27;s calculate 25 * 37 step by step.\n\n**Method 1: Breaking down 37**\n\n1.  **Break down 37 into 30 + 7:**  This makes the multiplication easier ... (552 chars)&quot;</span>,
         <span class="hl-extra"><span class='json-key'>"refusal"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
         <span class="hl-extra"><span class='json-key'>"annotations"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
         <span class="hl-extra"><span class='json-key'>"audio"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
@@ -695,8 +693,8 @@
   <span class="hl-extra"><span class='json-key'>"system_fingerprint"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
   <span class='json-key'>"usage"</span>: {
     <span class='json-key'>"prompt_tokens"</span>: <span class='json-num'>24</span>,
-    <span class='json-key'>"total_tokens"</span>: <span class='json-num'>226</span>,
-    <span class='json-key'>"completion_tokens"</span>: <span class='json-num'>202</span>,
+    <span class='json-key'>"total_tokens"</span>: <span class='json-num'>304</span>,
+    <span class='json-key'>"completion_tokens"</span>: <span class='json-num'>280</span>,
     <span class="hl-removed"><span class='json-key'>"prompt_tokens_details"</span>: <span class="hl-removed"><span class='json-null'>null</span></span></span>
   },
   <span class="hl-extra"><span class='json-key'>"prompt_logprobs"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
@@ -706,16 +704,16 @@
         <div class="panel normalized">
           <div class="panel-label">Adapter-Normalized</div>
           <pre><code>{
-  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;chatcmpl-9735ce30f46d482694c3ef7392cf4111&quot;</span>,
+  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;chatcmpl-6fa73723cb8645098a96155a69e7b052&quot;</span>,
   <span class='json-key'>"object"</span>: <span class='json-str'>&quot;chat.completion&quot;</span>,
-  <span class='json-key'>"created"</span>: <span class='json-num'>1772726914</span>,
+  <span class='json-key'>"created"</span>: <span class='json-num'>1772727900</span>,
   <span class='json-key'>"model"</span>: <span class='json-str'>&quot;google/gemma-3-27b-it&quot;</span>,
   <span class='json-key'>"choices"</span>: [
     {
       <span class='json-key'>"index"</span>: <span class='json-num'>0</span>,
       <span class='json-key'>"message"</span>: {
         <span class='json-key'>"role"</span>: <span class='json-str'>&quot;assistant&quot;</span>,
-        <span class='json-key'>"content"</span>: <span class='json-str'>&quot;Okay, let&#x27;s calculate 25 * 37 step by step:\n\n**1. Break down 37:**\n\nWe can think of 37 as (30 + 7).\n\n**2. Distribute the 25:**\n\nNow we can multiply 25... (397 chars)&quot;</span>,
+        <span class='json-key'>"content"</span>: <span class='json-str'>&quot;Okay, let&#x27;s calculate 25 * 37 step by step.\n\n**Method 1: Breaking down 37**\n\n1.  **Break down 37 into 30 + 7:**  This makes the multiplication easier ... (552 chars)&quot;</span>,
         <span class='json-key'>"refusal"</span>: <span class='json-null'>null</span>,
         <span class='json-key'>"annotations"</span>: <span class='json-null'>null</span>,
         <span class='json-key'>"audio"</span>: <span class='json-null'>null</span>,
@@ -731,8 +729,8 @@
   <span class='json-key'>"system_fingerprint"</span>: <span class='json-null'>null</span>,
   <span class='json-key'>"usage"</span>: {
     <span class='json-key'>"prompt_tokens"</span>: <span class='json-num'>24</span>,
-    <span class='json-key'>"total_tokens"</span>: <span class='json-num'>226</span>,
-    <span class='json-key'>"completion_tokens"</span>: <span class='json-num'>202</span>
+    <span class='json-key'>"total_tokens"</span>: <span class='json-num'>304</span>,
+    <span class='json-key'>"completion_tokens"</span>: <span class='json-num'>280</span>
   },
   <span class='json-key'>"prompt_logprobs"</span>: <span class='json-null'>null</span>,
   <span class='json-key'>"kv_transfer_params"</span>: <span class='json-null'>null</span>
@@ -785,9 +783,9 @@
         <div class="panel raw">
           <div class="panel-label">Raw Nvidia Response</div>
           <pre><code>{
-  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;chatcmpl-af3ff87dbec24b73adee54b0c5e9d21e&quot;</span>,
+  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;chatcmpl-ce5851f457564b0eb9c6ed110874904c&quot;</span>,
   <span class='json-key'>"object"</span>: <span class='json-str'>&quot;chat.completion&quot;</span>,
-  <span class='json-key'>"created"</span>: <span class='json-num'>1772726919</span>,
+  <span class='json-key'>"created"</span>: <span class='json-num'>1772727907</span>,
   <span class='json-key'>"model"</span>: <span class='json-str'>&quot;mistralai/mistral-small-3.1-24b-instruct-2503&quot;</span>,
   <span class='json-key'>"choices"</span>: [
     {
@@ -795,7 +793,7 @@
       <span class='json-key'>"message"</span>: {
         <span class='json-key'>"role"</span>: <span class='json-str'>&quot;assistant&quot;</span>,
         <span class='json-key'>"reasoning_content"</span>: <span class='json-null'>null</span>,
-        <span class='json-key'>"content"</span>: <span class='json-str'>&quot;To calculate 25 * 37, you can use the multiplication steps as follows:\n\n1. Multiply 25 by 7 (the ones place in 37):\n   25 * 7 = 175\n\n2. Multiply 25 by... (338 chars)&quot;</span>,
+        <span class='json-key'>"content"</span>: <span class='json-str'>&quot;To calculate \\( 25 \\times 37 \\), you can break it down step by step:\n\n1. **Break down 37 into simpler parts**:\n   - \\( 37 = 30 + 7 \\)\n\n2. **Distribute... (447 chars)&quot;</span>,
         <span class="hl-extra"><span class='json-key'>"tool_calls"</span>: <span class="hl-extra">[]</span></span>
       },
       <span class="hl-extra"><span class='json-key'>"logprobs"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
@@ -805,8 +803,8 @@
   ],
   <span class='json-key'>"usage"</span>: {
     <span class='json-key'>"prompt_tokens"</span>: <span class='json-num'>18</span>,
-    <span class='json-key'>"total_tokens"</span>: <span class='json-num'>163</span>,
-    <span class='json-key'>"completion_tokens"</span>: <span class='json-num'>145</span>,
+    <span class='json-key'>"total_tokens"</span>: <span class='json-num'>216</span>,
+    <span class='json-key'>"completion_tokens"</span>: <span class='json-num'>198</span>,
     <span class="hl-removed"><span class='json-key'>"prompt_tokens_details"</span>: <span class="hl-removed"><span class='json-null'>null</span></span></span>
   },
   <span class="hl-extra"><span class='json-key'>"prompt_logprobs"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>
@@ -815,16 +813,16 @@
         <div class="panel normalized">
           <div class="panel-label">Adapter-Normalized</div>
           <pre><code>{
-  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;chatcmpl-af3ff87dbec24b73adee54b0c5e9d21e&quot;</span>,
+  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;chatcmpl-ce5851f457564b0eb9c6ed110874904c&quot;</span>,
   <span class='json-key'>"object"</span>: <span class='json-str'>&quot;chat.completion&quot;</span>,
-  <span class='json-key'>"created"</span>: <span class='json-num'>1772726919</span>,
+  <span class='json-key'>"created"</span>: <span class='json-num'>1772727907</span>,
   <span class='json-key'>"model"</span>: <span class='json-str'>&quot;mistralai/mistral-small-3.1-24b-instruct-2503&quot;</span>,
   <span class='json-key'>"choices"</span>: [
     {
       <span class='json-key'>"index"</span>: <span class='json-num'>0</span>,
       <span class='json-key'>"message"</span>: {
         <span class='json-key'>"role"</span>: <span class='json-str'>&quot;assistant&quot;</span>,
-        <span class='json-key'>"content"</span>: <span class='json-str'>&quot;To calculate 25 * 37, you can use the multiplication steps as follows:\n\n1. Multiply 25 by 7 (the ones place in 37):\n   25 * 7 = 175\n\n2. Multiply 25 by... (338 chars)&quot;</span>,
+        <span class='json-key'>"content"</span>: <span class='json-str'>&quot;To calculate \\( 25 \\times 37 \\), you can break it down step by step:\n\n1. **Break down 37 into simpler parts**:\n   - \\( 37 = 30 + 7 \\)\n\n2. **Distribute... (447 chars)&quot;</span>,
         <span class='json-key'>"tool_calls"</span>: []
       },
       <span class='json-key'>"logprobs"</span>: <span class='json-null'>null</span>,
@@ -834,8 +832,8 @@
   ],
   <span class='json-key'>"usage"</span>: {
     <span class='json-key'>"prompt_tokens"</span>: <span class='json-num'>18</span>,
-    <span class='json-key'>"total_tokens"</span>: <span class='json-num'>163</span>,
-    <span class='json-key'>"completion_tokens"</span>: <span class='json-num'>145</span>
+    <span class='json-key'>"total_tokens"</span>: <span class='json-num'>216</span>,
+    <span class='json-key'>"completion_tokens"</span>: <span class='json-num'>198</span>
   },
   <span class='json-key'>"prompt_logprobs"</span>: <span class='json-null'>null</span>
 }</code></pre>
@@ -936,16 +934,16 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
         <div class="panel raw">
           <div class="panel-label">Raw Nvidia Response</div>
           <pre><code>{
-  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;chatcmpl-14d917a5ba4b43bfad551468f467cc94&quot;</span>,
+  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;chatcmpl-aff7c939fe33407b81616ad5b1d0d666&quot;</span>,
   <span class='json-key'>"object"</span>: <span class='json-str'>&quot;chat.completion&quot;</span>,
-  <span class='json-key'>"created"</span>: <span class='json-num'>1772726929</span>,
+  <span class='json-key'>"created"</span>: <span class='json-num'>1772727921</span>,
   <span class='json-key'>"model"</span>: <span class='json-str'>&quot;microsoft/phi-4-mini-flash-reasoning&quot;</span>,
   <span class='json-key'>"choices"</span>: [
     {
       <span class='json-key'>"index"</span>: <span class='json-num'>0</span>,
       <span class='json-key'>"message"</span>: {
         <span class='json-key'>"role"</span>: <span class='json-str'>&quot;assistant&quot;</span>,
-        <span class="hl-removed"><span class='json-key'>"content"</span>: <span class="hl-removed"><span class='json-str'>&quot;&lt;think&gt;\nOkay, so I need to figure out what 25 multiplied by 37 is. Let me think about how to approach this. I know that multiplying two numbers can so... (3176 chars)&quot;</span></span></span>,
+        <span class="hl-removed"><span class='json-key'>"content"</span>: <span class="hl-removed"><span class='json-str'>&quot;&lt;think&gt;\nOkay, let me try to figure out what 25 multiplied by 37 is. Hmm, I know that multiplying by 25 can be done by multiplying by 100 and then divi... (3655 chars)&quot;</span></span></span>,
         <span class="hl-extra"><span class='json-key'>"refusal"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
         <span class="hl-extra"><span class='json-key'>"annotations"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
         <span class="hl-extra"><span class='json-key'>"audio"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
@@ -954,16 +952,16 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
         <span class='json-key'>"reasoning_content"</span>: <span class='json-null'>null</span>
       },
       <span class="hl-extra"><span class='json-key'>"logprobs"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
-      <span class='json-key'>"finish_reason"</span>: <span class='json-str'>&quot;length&quot;</span>,
-      <span class="hl-extra"><span class='json-key'>"stop_reason"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>
+      <span class='json-key'>"finish_reason"</span>: <span class='json-str'>&quot;stop&quot;</span>,
+      <span class="hl-extra"><span class='json-key'>"stop_reason"</span>: <span class="hl-extra"><span class='json-num'>200020</span></span></span>
     }
   ],
   <span class="hl-extra"><span class='json-key'>"service_tier"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
   <span class="hl-extra"><span class='json-key'>"system_fingerprint"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
   <span class='json-key'>"usage"</span>: {
     <span class='json-key'>"prompt_tokens"</span>: <span class='json-num'>16</span>,
-    <span class='json-key'>"total_tokens"</span>: <span class='json-num'>1040</span>,
-    <span class='json-key'>"completion_tokens"</span>: <span class='json-num'>1024</span>,
+    <span class='json-key'>"total_tokens"</span>: <span class='json-num'>1249</span>,
+    <span class='json-key'>"completion_tokens"</span>: <span class='json-num'>1233</span>,
     <span class="hl-removed"><span class='json-key'>"prompt_tokens_details"</span>: <span class="hl-removed"><span class='json-null'>null</span></span></span>
   },
   <span class="hl-extra"><span class='json-key'>"prompt_logprobs"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
@@ -973,213 +971,52 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
         <div class="panel normalized">
           <div class="panel-label">Adapter-Normalized</div>
           <pre><code>{
-  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;chatcmpl-14d917a5ba4b43bfad551468f467cc94&quot;</span>,
+  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;chatcmpl-aff7c939fe33407b81616ad5b1d0d666&quot;</span>,
   <span class='json-key'>"object"</span>: <span class='json-str'>&quot;chat.completion&quot;</span>,
-  <span class='json-key'>"created"</span>: <span class='json-num'>1772726929</span>,
+  <span class='json-key'>"created"</span>: <span class='json-num'>1772727921</span>,
   <span class='json-key'>"model"</span>: <span class='json-str'>&quot;microsoft/phi-4-mini-flash-reasoning&quot;</span>,
   <span class='json-key'>"choices"</span>: [
     {
       <span class='json-key'>"index"</span>: <span class='json-num'>0</span>,
       <span class='json-key'>"message"</span>: {
         <span class='json-key'>"role"</span>: <span class='json-str'>&quot;assistant&quot;</span>,
-        <span class="hl-added"><span class='json-key'>"content"</span>: <span class="hl-added"><span class='json-str'>&quot;&lt;think&gt;\nOkay, so I need to figure out what 25 multiplied by 37 is. Let me think about how to approach this. I know that multiplying two numbers can so... (3176 chars)&quot;</span></span></span>,
-        <span class='json-key'>"refusal"</span>: <span class='json-null'>null</span>,
-        <span class='json-key'>"annotations"</span>: <span class='json-null'>null</span>,
-        <span class='json-key'>"audio"</span>: <span class='json-null'>null</span>,
-        <span class='json-key'>"function_call"</span>: <span class='json-null'>null</span>,
-        <span class='json-key'>"tool_calls"</span>: []
-      },
-      <span class='json-key'>"logprobs"</span>: <span class='json-null'>null</span>,
-      <span class='json-key'>"finish_reason"</span>: <span class='json-str'>&quot;length&quot;</span>,
-      <span class='json-key'>"stop_reason"</span>: <span class='json-null'>null</span>
-    }
-  ],
-  <span class='json-key'>"service_tier"</span>: <span class='json-null'>null</span>,
-  <span class='json-key'>"system_fingerprint"</span>: <span class='json-null'>null</span>,
-  <span class='json-key'>"usage"</span>: {
-    <span class='json-key'>"prompt_tokens"</span>: <span class='json-num'>16</span>,
-    <span class='json-key'>"total_tokens"</span>: <span class='json-num'>1040</span>,
-    <span class='json-key'>"completion_tokens"</span>: <span class='json-num'>1024</span>
-  },
-  <span class='json-key'>"prompt_logprobs"</span>: <span class='json-null'>null</span>,
-  <span class='json-key'>"kv_transfer_params"</span>: <span class='json-null'>null</span>
-}</code></pre>
-        </div>
-      </div>
-    </div>
-
-    <div class="model-card" id="llama-3.1-nemotron-ultra-253b-v1">
-      <div class="model-header">
-        <h3>nvidia/llama-3.1-nemotron-ultra-253b-v1</h3>
-        <div class="header-badges">
-          <span class="status-badge ok">OK</span>
-          <span class="count-badge fixed">2 fixed</span>
-          <span class="count-badge extra">13 extra fields</span>
-        </div>
-      </div>
-
-      <div class="deviations">
-        <h4>Deviations Found (15)</h4>
-        
-            <div class="dev-item fix-applied">
-              <div class="dev-label"><span class="badge" style="background:#dc3545">THINKING</span> reasoning_content field</div>
-              <div class="dev-arrow">&#8594;</div>
-              <div class="dev-fix">Moved to message.thinking.content, field removed</div>
-            </div>
-            <div class="dev-item fix-applied">
-              <div class="dev-label"><span class="badge" style="background:#fd7e14">NULL</span> prompt_tokens_details: null</div>
-              <div class="dev-arrow">&#8594;</div>
-              <div class="dev-fix">Field omitted</div>
-            </div>
-            <div class="dev-item fix-passthrough">
-              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: service_tier</div>
-              <div class="dev-arrow"></div>
-              <div class="dev-fix">Passed through (adapter preserves unknown fields)</div>
-            </div>
-            <div class="dev-item fix-passthrough">
-              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: system_fingerprint</div>
-              <div class="dev-arrow"></div>
-              <div class="dev-fix">Passed through (adapter preserves unknown fields)</div>
-            </div>
-            <div class="dev-item fix-passthrough">
-              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: prompt_logprobs</div>
-              <div class="dev-arrow"></div>
-              <div class="dev-fix">Passed through (adapter preserves unknown fields)</div>
-            </div>
-            <div class="dev-item fix-passthrough">
-              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: prompt_token_ids</div>
-              <div class="dev-arrow"></div>
-              <div class="dev-fix">Passed through (adapter preserves unknown fields)</div>
-            </div>
-            <div class="dev-item fix-passthrough">
-              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: kv_transfer_params</div>
-              <div class="dev-arrow"></div>
-              <div class="dev-fix">Passed through (adapter preserves unknown fields)</div>
-            </div>
-            <div class="dev-item fix-passthrough">
-              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: choices[].logprobs</div>
-              <div class="dev-arrow"></div>
-              <div class="dev-fix">Passed through</div>
-            </div>
-            <div class="dev-item fix-passthrough">
-              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: choices[].stop_reason</div>
-              <div class="dev-arrow"></div>
-              <div class="dev-fix">Passed through</div>
-            </div>
-            <div class="dev-item fix-passthrough">
-              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: choices[].token_ids</div>
-              <div class="dev-arrow"></div>
-              <div class="dev-fix">Passed through</div>
-            </div>
-            <div class="dev-item fix-passthrough">
-              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: message.refusal</div>
-              <div class="dev-arrow"></div>
-              <div class="dev-fix">Passed through</div>
-            </div>
-            <div class="dev-item fix-passthrough">
-              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: message.annotations</div>
-              <div class="dev-arrow"></div>
-              <div class="dev-fix">Passed through</div>
-            </div>
-            <div class="dev-item fix-passthrough">
-              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: message.audio</div>
-              <div class="dev-arrow"></div>
-              <div class="dev-fix">Passed through</div>
-            </div>
-            <div class="dev-item fix-passthrough">
-              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: message.function_call</div>
-              <div class="dev-arrow"></div>
-              <div class="dev-fix">Passed through</div>
-            </div>
-            <div class="dev-item fix-passthrough">
-              <div class="dev-label"><span class="badge" style="background:#6c757d">EXTRA</span> Non-spec field: message.tool_calls</div>
-              <div class="dev-arrow"></div>
-              <div class="dev-fix">Passed through</div>
-            </div>
-      </div>
-
-      <div class="panels">
-        <div class="panel raw">
-          <div class="panel-label">Raw Nvidia Response</div>
-          <pre><code>{
-  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;chatcmpl-89f465d3825948e18423d4f713e7a13f&quot;</span>,
-  <span class='json-key'>"object"</span>: <span class='json-str'>&quot;chat.completion&quot;</span>,
-  <span class='json-key'>"created"</span>: <span class='json-num'>1772726982</span>,
-  <span class='json-key'>"model"</span>: <span class='json-str'>&quot;stg/nvidia/llama-3.1-nemotron-ultra-253b-v1&quot;</span>,
-  <span class='json-key'>"choices"</span>: [
-    {
-      <span class='json-key'>"index"</span>: <span class='json-num'>0</span>,
-      <span class='json-key'>"message"</span>: {
-        <span class='json-key'>"role"</span>: <span class='json-str'>&quot;assistant&quot;</span>,
-        <span class='json-key'>"content"</span>: <span class='json-str'>&quot;To calculate \\(25 \\times 37\\), you can use the distributive property to break it down into simpler steps:\n\n1. **Split 37 into 30 and 7:**\n   \\[\n   25 ... (572 chars)&quot;</span>,
-        <span class="hl-extra"><span class='json-key'>"refusal"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
-        <span class="hl-extra"><span class='json-key'>"annotations"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
-        <span class="hl-extra"><span class='json-key'>"audio"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
-        <span class="hl-extra"><span class='json-key'>"function_call"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
-        <span class="hl-extra"><span class='json-key'>"tool_calls"</span>: <span class="hl-extra">[]</span></span>,
-        <span class="hl-removed"><span class='json-key'>"reasoning_content"</span>: <span class="hl-removed"><span class='json-str'>&quot;Okay, so I need to figure out what 25 multiplied by 37 is. Let me think. First, I know that multiplication is essentially repeated addition, but doing... (2401 chars)&quot;</span></span></span>
-      },
-      <span class="hl-extra"><span class='json-key'>"logprobs"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
-      <span class='json-key'>"finish_reason"</span>: <span class='json-str'>&quot;stop&quot;</span>,
-      <span class="hl-extra"><span class='json-key'>"stop_reason"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
-      <span class="hl-extra"><span class='json-key'>"token_ids"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>
-    }
-  ],
-  <span class="hl-extra"><span class='json-key'>"service_tier"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
-  <span class="hl-extra"><span class='json-key'>"system_fingerprint"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
-  <span class='json-key'>"usage"</span>: {
-    <span class='json-key'>"prompt_tokens"</span>: <span class='json-num'>32</span>,
-    <span class='json-key'>"total_tokens"</span>: <span class='json-num'>1017</span>,
-    <span class='json-key'>"completion_tokens"</span>: <span class='json-num'>985</span>,
-    <span class="hl-removed"><span class='json-key'>"prompt_tokens_details"</span>: <span class="hl-removed"><span class='json-null'>null</span></span></span>
-  },
-  <span class="hl-extra"><span class='json-key'>"prompt_logprobs"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
-  <span class="hl-extra"><span class='json-key'>"prompt_token_ids"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
-  <span class="hl-extra"><span class='json-key'>"kv_transfer_params"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>
-}</code></pre>
-        </div>
-        <div class="panel normalized">
-          <div class="panel-label">Adapter-Normalized</div>
-          <pre><code>{
-  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;chatcmpl-89f465d3825948e18423d4f713e7a13f&quot;</span>,
-  <span class='json-key'>"object"</span>: <span class='json-str'>&quot;chat.completion&quot;</span>,
-  <span class='json-key'>"created"</span>: <span class='json-num'>1772726982</span>,
-  <span class='json-key'>"model"</span>: <span class='json-str'>&quot;stg/nvidia/llama-3.1-nemotron-ultra-253b-v1&quot;</span>,
-  <span class='json-key'>"choices"</span>: [
-    {
-      <span class='json-key'>"index"</span>: <span class='json-num'>0</span>,
-      <span class='json-key'>"message"</span>: {
-        <span class='json-key'>"role"</span>: <span class='json-str'>&quot;assistant&quot;</span>,
-        <span class='json-key'>"content"</span>: <span class='json-str'>&quot;To calculate \\(25 \\times 37\\), you can use the distributive property to break it down into simpler steps:\n\n1. **Split 37 into 30 and 7:**\n   \\[\n   25 ... (572 chars)&quot;</span>,
+        <span class="hl-added"><span class='json-key'>"content"</span>: <span class="hl-added"><span class='json-str'>&quot;To calculate \\(25 \\times 37\\), we can break it down using the distributive property:\n\n1. **Split 37 into 30 and 7**:\n   \\[\n   25 \\times 37 = 25 \\times... (718 chars)&quot;</span></span></span>,
         <span class='json-key'>"refusal"</span>: <span class='json-null'>null</span>,
         <span class='json-key'>"annotations"</span>: <span class='json-null'>null</span>,
         <span class='json-key'>"audio"</span>: <span class='json-null'>null</span>,
         <span class='json-key'>"function_call"</span>: <span class='json-null'>null</span>,
         <span class='json-key'>"tool_calls"</span>: [],
         <span class="hl-added"><span class='json-key'>"thinking"</span>: {
-          <span class="hl-added"><span class='json-key'>"content"</span>: <span class="hl-added"><span class='json-str'>&quot;Okay, so I need to figure out what 25 multiplied by 37 is. Let me think. First, I know that multiplication is essentially repeated addition, but doing... (2401 chars)&quot;</span></span></span>
+          <span class="hl-added"><span class='json-key'>"content"</span>: <span class="hl-added"><span class='json-str'>&quot;Okay, let me try to figure out what 25 multiplied by 37 is. Hmm, I know that multiplying by 25 can be done by multiplying by 100 and then dividing by ... (2918 chars)&quot;</span></span></span>
         }</span>
       },
       <span class='json-key'>"logprobs"</span>: <span class='json-null'>null</span>,
       <span class='json-key'>"finish_reason"</span>: <span class='json-str'>&quot;stop&quot;</span>,
-      <span class='json-key'>"stop_reason"</span>: <span class='json-null'>null</span>,
-      <span class='json-key'>"token_ids"</span>: <span class='json-null'>null</span>
+      <span class='json-key'>"stop_reason"</span>: <span class='json-num'>200020</span>
     }
   ],
   <span class='json-key'>"service_tier"</span>: <span class='json-null'>null</span>,
   <span class='json-key'>"system_fingerprint"</span>: <span class='json-null'>null</span>,
   <span class='json-key'>"usage"</span>: {
-    <span class='json-key'>"prompt_tokens"</span>: <span class='json-num'>32</span>,
-    <span class='json-key'>"total_tokens"</span>: <span class='json-num'>1017</span>,
-    <span class='json-key'>"completion_tokens"</span>: <span class='json-num'>985</span>
+    <span class='json-key'>"prompt_tokens"</span>: <span class='json-num'>16</span>,
+    <span class='json-key'>"total_tokens"</span>: <span class='json-num'>1249</span>,
+    <span class='json-key'>"completion_tokens"</span>: <span class='json-num'>1233</span>
   },
   <span class='json-key'>"prompt_logprobs"</span>: <span class='json-null'>null</span>,
-  <span class='json-key'>"prompt_token_ids"</span>: <span class='json-null'>null</span>,
   <span class='json-key'>"kv_transfer_params"</span>: <span class='json-null'>null</span>
 }</code></pre>
         </div>
       </div>
     </div>
+
+        <div class="model-card error">
+          <div class="model-header">
+            <h3>llama-3.1-nemotron-ultra-253b-v1</h3>
+            <span class="status-badge error">ERROR</span>
+          </div>
+          <p class="error-msg">Server error &#x27;500 Internal Server Error&#x27; for url &#x27;https://integrate.api.nvidia.com/v1/chat/completions&#x27;
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500</p>
+        </div>
 
     <div class="model-card" id="nemotron-mini-4b-instruct">
       <div class="model-header">
@@ -1210,9 +1047,9 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
         <div class="panel raw">
           <div class="panel-label">Raw Nvidia Response</div>
           <pre><code>{
-  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;chat-e69224c1d3d649bdad7c13d1d921fe45&quot;</span>,
+  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;chat-34cb7b7de4b74832b8e90f54b7959c5a&quot;</span>,
   <span class='json-key'>"object"</span>: <span class='json-str'>&quot;chat.completion&quot;</span>,
-  <span class='json-key'>"created"</span>: <span class='json-num'>1772726985</span>,
+  <span class='json-key'>"created"</span>: <span class='json-num'>1772727949</span>,
   <span class='json-key'>"model"</span>: <span class='json-str'>&quot;nvidia/nemotron-mini-4b-instruct&quot;</span>,
   <span class='json-key'>"choices"</span>: [
     {
@@ -1236,9 +1073,9 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
         <div class="panel normalized">
           <div class="panel-label">Adapter-Normalized</div>
           <pre><code>{
-  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;chat-e69224c1d3d649bdad7c13d1d921fe45&quot;</span>,
+  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;chat-34cb7b7de4b74832b8e90f54b7959c5a&quot;</span>,
   <span class='json-key'>"object"</span>: <span class='json-str'>&quot;chat.completion&quot;</span>,
-  <span class='json-key'>"created"</span>: <span class='json-num'>1772726985</span>,
+  <span class='json-key'>"created"</span>: <span class='json-num'>1772727949</span>,
   <span class='json-key'>"model"</span>: <span class='json-str'>&quot;nvidia/nemotron-mini-4b-instruct&quot;</span>,
   <span class='json-key'>"choices"</span>: [
     {
@@ -1296,9 +1133,9 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
         <div class="panel raw">
           <div class="panel-label">Raw Nvidia Response</div>
           <pre><code>{
-  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;chat-f396d32059964ec89969f4e464cb283d&quot;</span>,
+  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;chat-6b6750c452a54000bf93f0355d94a14d&quot;</span>,
   <span class='json-key'>"object"</span>: <span class='json-str'>&quot;chat.completion&quot;</span>,
-  <span class='json-key'>"created"</span>: <span class='json-num'>1772726990</span>,
+  <span class='json-key'>"created"</span>: <span class='json-num'>1772727954</span>,
   <span class='json-key'>"model"</span>: <span class='json-str'>&quot;qwen/qwen2.5-coder-32b-instruct&quot;</span>,
   <span class='json-key'>"choices"</span>: [
     {
@@ -1323,9 +1160,9 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
         <div class="panel normalized">
           <div class="panel-label">Adapter-Normalized</div>
           <pre><code>{
-  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;chat-f396d32059964ec89969f4e464cb283d&quot;</span>,
+  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;chat-6b6750c452a54000bf93f0355d94a14d&quot;</span>,
   <span class='json-key'>"object"</span>: <span class='json-str'>&quot;chat.completion&quot;</span>,
-  <span class='json-key'>"created"</span>: <span class='json-num'>1772726990</span>,
+  <span class='json-key'>"created"</span>: <span class='json-num'>1772727954</span>,
   <span class='json-key'>"model"</span>: <span class='json-str'>&quot;qwen/qwen2.5-coder-32b-instruct&quot;</span>,
   <span class='json-key'>"choices"</span>: [
     {
@@ -1389,16 +1226,16 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
         <div class="panel raw">
           <div class="panel-label">Raw Nvidia Response</div>
           <pre><code>{
-  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;chat-8b4f1b0d254b4f37aeadca07b4ae51d8&quot;</span>,
+  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;chat-800b5c5ea5e34e6daf5f10638b541064&quot;</span>,
   <span class='json-key'>"object"</span>: <span class='json-str'>&quot;chat.completion&quot;</span>,
-  <span class='json-key'>"created"</span>: <span class='json-num'>1772726997</span>,
+  <span class='json-key'>"created"</span>: <span class='json-num'>1772727960</span>,
   <span class='json-key'>"model"</span>: <span class='json-str'>&quot;deepseek-ai/deepseek-r1-distill-llama-8b&quot;</span>,
   <span class='json-key'>"choices"</span>: [
     {
       <span class='json-key'>"index"</span>: <span class='json-num'>0</span>,
       <span class='json-key'>"message"</span>: {
         <span class='json-key'>"role"</span>: <span class='json-str'>&quot;assistant&quot;</span>,
-        <span class="hl-removed"><span class='json-key'>"content"</span>: <span class="hl-removed"><span class='json-str'>&quot;&lt;think&gt;\nTo calculate 25 multiplied by 37, I will break down the multiplication to make the process manageable.\n\nI can start by separating 37 into 30 a... (921 chars)&quot;</span></span></span>
+        <span class="hl-removed"><span class='json-key'>"content"</span>: <span class="hl-removed"><span class='json-str'>&quot;&lt;think&gt;\nTo calculate 25 multiplied by 37, I will break down the multiplication to make the process manageable.\n\nI can start by separating 37 into 30 a... (1244 chars)&quot;</span></span></span>
       },
       <span class="hl-extra"><span class='json-key'>"logprobs"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
       <span class='json-key'>"finish_reason"</span>: <span class='json-str'>&quot;stop&quot;</span>,
@@ -1407,8 +1244,8 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
   ],
   <span class='json-key'>"usage"</span>: {
     <span class='json-key'>"prompt_tokens"</span>: <span class='json-num'>16</span>,
-    <span class='json-key'>"total_tokens"</span>: <span class='json-num'>291</span>,
-    <span class='json-key'>"completion_tokens"</span>: <span class='json-num'>275</span>
+    <span class='json-key'>"total_tokens"</span>: <span class='json-num'>410</span>,
+    <span class='json-key'>"completion_tokens"</span>: <span class='json-num'>394</span>
   },
   <span class="hl-extra"><span class='json-key'>"prompt_logprobs"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>
 }</code></pre>
@@ -1416,18 +1253,18 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
         <div class="panel normalized">
           <div class="panel-label">Adapter-Normalized</div>
           <pre><code>{
-  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;chat-8b4f1b0d254b4f37aeadca07b4ae51d8&quot;</span>,
+  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;chat-800b5c5ea5e34e6daf5f10638b541064&quot;</span>,
   <span class='json-key'>"object"</span>: <span class='json-str'>&quot;chat.completion&quot;</span>,
-  <span class='json-key'>"created"</span>: <span class='json-num'>1772726997</span>,
+  <span class='json-key'>"created"</span>: <span class='json-num'>1772727960</span>,
   <span class='json-key'>"model"</span>: <span class='json-str'>&quot;deepseek-ai/deepseek-r1-distill-llama-8b&quot;</span>,
   <span class='json-key'>"choices"</span>: [
     {
       <span class='json-key'>"index"</span>: <span class='json-num'>0</span>,
       <span class='json-key'>"message"</span>: {
         <span class='json-key'>"role"</span>: <span class='json-str'>&quot;assistant&quot;</span>,
-        <span class="hl-added"><span class='json-key'>"content"</span>: <span class="hl-added"><span class='json-str'>&quot;**Solution:**\n\nTo calculate \\( 25 \\times 37 \\), follow these easy steps:\n\n1. **Break Down the Multiplication:**\n   \\[\n   25 \\times 37 = 25 \\times (30 ... (416 chars)&quot;</span></span></span>,
+        <span class="hl-added"><span class='json-key'>"content"</span>: <span class="hl-added"><span class='json-str'>&quot;To multiply \\(25\\) by \\(37\\), follow these easy steps:\n\n1. **Break Down the Numbers**:\n   - You can separate \\(37\\) into \\(30\\) and \\(7\\).\n   - So, th... (652 chars)&quot;</span></span></span>,
         <span class="hl-added"><span class='json-key'>"thinking"</span>: {
-          <span class="hl-added"><span class='json-key'>"content"</span>: <span class="hl-added"><span class='json-str'>&quot;To calculate 25 multiplied by 37, I will break down the multiplication to make the process manageable.\n\nI can start by separating 37 into 30 and 7. Th... (486 chars)&quot;</span></span></span>
+          <span class="hl-added"><span class='json-key'>"content"</span>: <span class="hl-added"><span class='json-str'>&quot;To calculate 25 multiplied by 37, I will break down the multiplication to make the process manageable.\n\nI can start by separating 37 into 30 and 7. Th... (573 chars)&quot;</span></span></span>
         }</span>
       },
       <span class='json-key'>"logprobs"</span>: <span class='json-null'>null</span>,
@@ -1437,8 +1274,8 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
   ],
   <span class='json-key'>"usage"</span>: {
     <span class='json-key'>"prompt_tokens"</span>: <span class='json-num'>16</span>,
-    <span class='json-key'>"total_tokens"</span>: <span class='json-num'>291</span>,
-    <span class='json-key'>"completion_tokens"</span>: <span class='json-num'>275</span>
+    <span class='json-key'>"total_tokens"</span>: <span class='json-num'>410</span>,
+    <span class='json-key'>"completion_tokens"</span>: <span class='json-num'>394</span>
   },
   <span class='json-key'>"prompt_logprobs"</span>: <span class='json-null'>null</span>
 }</code></pre>
@@ -1475,9 +1312,9 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
         <div class="panel raw">
           <div class="panel-label">Raw Nvidia Response</div>
           <pre><code>{
-  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;cmpl-81ee4acbb8ee4b3fb3c1f3d512efa8f9&quot;</span>,
+  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;cmpl-7a9358fa13cd4ccaae52406d0628a011&quot;</span>,
   <span class='json-key'>"object"</span>: <span class='json-str'>&quot;chat.completion&quot;</span>,
-  <span class='json-key'>"created"</span>: <span class='json-num'>1772727002</span>,
+  <span class='json-key'>"created"</span>: <span class='json-num'>1772727967</span>,
   <span class='json-key'>"model"</span>: <span class='json-str'>&quot;upstage/solar-10.7b-instruct&quot;</span>,
   <span class='json-key'>"choices"</span>: [
     {
@@ -1501,9 +1338,9 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
         <div class="panel normalized">
           <div class="panel-label">Adapter-Normalized</div>
           <pre><code>{
-  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;cmpl-81ee4acbb8ee4b3fb3c1f3d512efa8f9&quot;</span>,
+  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;cmpl-7a9358fa13cd4ccaae52406d0628a011&quot;</span>,
   <span class='json-key'>"object"</span>: <span class='json-str'>&quot;chat.completion&quot;</span>,
-  <span class='json-key'>"created"</span>: <span class='json-num'>1772727002</span>,
+  <span class='json-key'>"created"</span>: <span class='json-num'>1772727967</span>,
   <span class='json-key'>"model"</span>: <span class='json-str'>&quot;upstage/solar-10.7b-instruct&quot;</span>,
   <span class='json-key'>"choices"</span>: [
     {
@@ -1621,16 +1458,16 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
         <div class="panel raw">
           <div class="panel-label">Raw Nvidia Response</div>
           <pre><code>{
-  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;chatcmpl-bd187fddc1fa3bdb&quot;</span>,
+  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;chatcmpl-ac986af496ae7f12&quot;</span>,
   <span class='json-key'>"object"</span>: <span class='json-str'>&quot;chat.completion&quot;</span>,
-  <span class='json-key'>"created"</span>: <span class='json-num'>1772727015</span>,
+  <span class='json-key'>"created"</span>: <span class='json-num'>1772727980</span>,
   <span class='json-key'>"model"</span>: <span class='json-str'>&quot;stg/ai21labs/jamba-1.5-mini-instruct&quot;</span>,
   <span class='json-key'>"choices"</span>: [
     {
       <span class='json-key'>"index"</span>: <span class='json-num'>0</span>,
       <span class='json-key'>"message"</span>: {
         <span class='json-key'>"role"</span>: <span class='json-str'>&quot;assistant&quot;</span>,
-        <span class='json-key'>"content"</span>: <span class='json-str'>&quot; Sure! Let&#x27;s solve $25 \\times 37$ step by step.\n\n### Step 1: Prime Factorization\n\nWe can first find the prime factorization of the numbers involved.\n\n... (465 chars)&quot;</span>,
+        <span class='json-key'>"content"</span>: <span class='json-str'>&quot; To multiply 25 by 37, we can follow these steps:\n\n1. **Set up the multiplication problem:**\n\n$$25 \\times 37$$\n\n2. **Perform the multiplication:**\n\n  ... (459 chars)&quot;</span>,
         <span class="hl-extra"><span class='json-key'>"refusal"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
         <span class="hl-extra"><span class='json-key'>"annotations"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
         <span class="hl-extra"><span class='json-key'>"audio"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
@@ -1649,8 +1486,8 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
   <span class="hl-extra"><span class='json-key'>"system_fingerprint"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
   <span class='json-key'>"usage"</span>: {
     <span class='json-key'>"prompt_tokens"</span>: <span class='json-num'>25</span>,
-    <span class='json-key'>"total_tokens"</span>: <span class='json-num'>206</span>,
-    <span class='json-key'>"completion_tokens"</span>: <span class='json-num'>181</span>,
+    <span class='json-key'>"total_tokens"</span>: <span class='json-num'>204</span>,
+    <span class='json-key'>"completion_tokens"</span>: <span class='json-num'>179</span>,
     <span class="hl-removed"><span class='json-key'>"prompt_tokens_details"</span>: <span class="hl-removed"><span class='json-null'>null</span></span></span>
   },
   <span class="hl-extra"><span class='json-key'>"prompt_logprobs"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
@@ -1661,16 +1498,16 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
         <div class="panel normalized">
           <div class="panel-label">Adapter-Normalized</div>
           <pre><code>{
-  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;chatcmpl-bd187fddc1fa3bdb&quot;</span>,
+  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;chatcmpl-ac986af496ae7f12&quot;</span>,
   <span class='json-key'>"object"</span>: <span class='json-str'>&quot;chat.completion&quot;</span>,
-  <span class='json-key'>"created"</span>: <span class='json-num'>1772727015</span>,
+  <span class='json-key'>"created"</span>: <span class='json-num'>1772727980</span>,
   <span class='json-key'>"model"</span>: <span class='json-str'>&quot;stg/ai21labs/jamba-1.5-mini-instruct&quot;</span>,
   <span class='json-key'>"choices"</span>: [
     {
       <span class='json-key'>"index"</span>: <span class='json-num'>0</span>,
       <span class='json-key'>"message"</span>: {
         <span class='json-key'>"role"</span>: <span class='json-str'>&quot;assistant&quot;</span>,
-        <span class='json-key'>"content"</span>: <span class='json-str'>&quot; Sure! Let&#x27;s solve $25 \\times 37$ step by step.\n\n### Step 1: Prime Factorization\n\nWe can first find the prime factorization of the numbers involved.\n\n... (465 chars)&quot;</span>,
+        <span class='json-key'>"content"</span>: <span class='json-str'>&quot; To multiply 25 by 37, we can follow these steps:\n\n1. **Set up the multiplication problem:**\n\n$$25 \\times 37$$\n\n2. **Perform the multiplication:**\n\n  ... (459 chars)&quot;</span>,
         <span class='json-key'>"refusal"</span>: <span class='json-null'>null</span>,
         <span class='json-key'>"annotations"</span>: <span class='json-null'>null</span>,
         <span class='json-key'>"audio"</span>: <span class='json-null'>null</span>,
@@ -1688,8 +1525,8 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
   <span class='json-key'>"system_fingerprint"</span>: <span class='json-null'>null</span>,
   <span class='json-key'>"usage"</span>: {
     <span class='json-key'>"prompt_tokens"</span>: <span class='json-num'>25</span>,
-    <span class='json-key'>"total_tokens"</span>: <span class='json-num'>206</span>,
-    <span class='json-key'>"completion_tokens"</span>: <span class='json-num'>181</span>
+    <span class='json-key'>"total_tokens"</span>: <span class='json-num'>204</span>,
+    <span class='json-key'>"completion_tokens"</span>: <span class='json-num'>179</span>
   },
   <span class='json-key'>"prompt_logprobs"</span>: <span class='json-null'>null</span>,
   <span class='json-key'>"prompt_token_ids"</span>: <span class='json-null'>null</span>,
@@ -1778,16 +1615,16 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
         <div class="panel raw">
           <div class="panel-label">Raw Nvidia Response</div>
           <pre><code>{
-  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;chatcmpl-e2e81ad9ca544be39cd8508ff168f0e0&quot;</span>,
+  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;chatcmpl-7546e47bfbde44b6aecee3b8b9f02fc6&quot;</span>,
   <span class='json-key'>"object"</span>: <span class='json-str'>&quot;chat.completion&quot;</span>,
-  <span class='json-key'>"created"</span>: <span class='json-num'>1772727020</span>,
+  <span class='json-key'>"created"</span>: <span class='json-num'>1772727985</span>,
   <span class='json-key'>"model"</span>: <span class='json-str'>&quot;thudm/chatglm3-6b&quot;</span>,
   <span class='json-key'>"choices"</span>: [
     {
       <span class='json-key'>"index"</span>: <span class='json-num'>0</span>,
       <span class='json-key'>"message"</span>: {
         <span class='json-key'>"role"</span>: <span class='json-str'>&quot;assistant&quot;</span>,
-        <span class='json-key'>"content"</span>: <span class='json-str'>&quot; We can start by multiplying the ones digit of 25 by the ones digit of 37, which is 5 * 7 = 35. We then multiply the tens digit of 25 by the ones digi... (365 chars)&quot;</span>,
+        <span class='json-key'>"content"</span>: <span class='json-str'>&quot; \n 25 times 37 is equal to 925. Here is the step by step calculation:&lt;br&gt;Step 1: Multiply 25 and 37: 25 x 37 = 925&lt;br&gt;Step 2: Write down the answer, 9... (187 chars)&quot;</span>,
         <span class="hl-extra"><span class='json-key'>"refusal"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
         <span class="hl-extra"><span class='json-key'>"annotations"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
         <span class="hl-extra"><span class='json-key'>"audio"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
@@ -1804,8 +1641,8 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
   <span class="hl-extra"><span class='json-key'>"system_fingerprint"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
   <span class='json-key'>"usage"</span>: {
     <span class='json-key'>"prompt_tokens"</span>: <span class='json-num'>26</span>,
-    <span class='json-key'>"total_tokens"</span>: <span class='json-num'>167</span>,
-    <span class='json-key'>"completion_tokens"</span>: <span class='json-num'>141</span>,
+    <span class='json-key'>"total_tokens"</span>: <span class='json-num'>115</span>,
+    <span class='json-key'>"completion_tokens"</span>: <span class='json-num'>89</span>,
     <span class="hl-removed"><span class='json-key'>"prompt_tokens_details"</span>: <span class="hl-removed"><span class='json-null'>null</span></span></span>
   },
   <span class="hl-extra"><span class='json-key'>"prompt_logprobs"</span>: <span class="hl-extra"><span class='json-null'>null</span></span></span>,
@@ -1815,16 +1652,16 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
         <div class="panel normalized">
           <div class="panel-label">Adapter-Normalized</div>
           <pre><code>{
-  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;chatcmpl-e2e81ad9ca544be39cd8508ff168f0e0&quot;</span>,
+  <span class='json-key'>"id"</span>: <span class='json-str'>&quot;chatcmpl-7546e47bfbde44b6aecee3b8b9f02fc6&quot;</span>,
   <span class='json-key'>"object"</span>: <span class='json-str'>&quot;chat.completion&quot;</span>,
-  <span class='json-key'>"created"</span>: <span class='json-num'>1772727020</span>,
+  <span class='json-key'>"created"</span>: <span class='json-num'>1772727985</span>,
   <span class='json-key'>"model"</span>: <span class='json-str'>&quot;thudm/chatglm3-6b&quot;</span>,
   <span class='json-key'>"choices"</span>: [
     {
       <span class='json-key'>"index"</span>: <span class='json-num'>0</span>,
       <span class='json-key'>"message"</span>: {
         <span class='json-key'>"role"</span>: <span class='json-str'>&quot;assistant&quot;</span>,
-        <span class='json-key'>"content"</span>: <span class='json-str'>&quot; We can start by multiplying the ones digit of 25 by the ones digit of 37, which is 5 * 7 = 35. We then multiply the tens digit of 25 by the ones digi... (365 chars)&quot;</span>,
+        <span class='json-key'>"content"</span>: <span class='json-str'>&quot; \n 25 times 37 is equal to 925. Here is the step by step calculation:&lt;br&gt;Step 1: Multiply 25 and 37: 25 x 37 = 925&lt;br&gt;Step 2: Write down the answer, 9... (187 chars)&quot;</span>,
         <span class='json-key'>"refusal"</span>: <span class='json-null'>null</span>,
         <span class='json-key'>"annotations"</span>: <span class='json-null'>null</span>,
         <span class='json-key'>"audio"</span>: <span class='json-null'>null</span>,
@@ -1840,8 +1677,8 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
   <span class='json-key'>"system_fingerprint"</span>: <span class='json-null'>null</span>,
   <span class='json-key'>"usage"</span>: {
     <span class='json-key'>"prompt_tokens"</span>: <span class='json-num'>26</span>,
-    <span class='json-key'>"total_tokens"</span>: <span class='json-num'>167</span>,
-    <span class='json-key'>"completion_tokens"</span>: <span class='json-num'>141</span>
+    <span class='json-key'>"total_tokens"</span>: <span class='json-num'>115</span>,
+    <span class='json-key'>"completion_tokens"</span>: <span class='json-num'>89</span>
   },
   <span class='json-key'>"prompt_logprobs"</span>: <span class='json-null'>null</span>,
   <span class='json-key'>"kv_transfer_params"</span>: <span class='json-null'>null</span>

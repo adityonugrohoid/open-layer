@@ -79,3 +79,9 @@ class NvidiaAdapter:
             clean_content = THINK_TAG_RE.sub("", content).strip()
             msg["content"] = clean_content
             msg["thinking"] = {"content": thinking_text}
+        elif content.startswith("<think>"):
+            # Unclosed <think> tag — model hit max_tokens before closing.
+            # Treat everything after <think> as thinking, content is empty.
+            thinking_text = content[7:].strip()  # skip "<think>"
+            msg["content"] = None
+            msg["thinking"] = {"content": thinking_text}
