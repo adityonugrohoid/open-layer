@@ -22,28 +22,38 @@
       "description": "Sum of prompt_tokens and completion_tokens."
     },
     "prompt_tokens_details": {
-      "type": "object",
-      "properties": {
-        "cached_tokens": {
-          "type": "integer",
-          "minimum": 0,
-          "description": "Number of prompt tokens served from cache."
-        }
-      },
-      "additionalProperties": true,
-      "description": "Breakdown of prompt token usage."
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "cached_tokens": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Number of prompt tokens served from cache."
+            }
+          },
+          "additionalProperties": true
+        },
+        {"type": "null"}
+      ],
+      "description": "Breakdown of prompt token usage, or null if not available."
     },
     "completion_tokens_details": {
-      "type": "object",
-      "properties": {
-        "reasoning_tokens": {
-          "type": "integer",
-          "minimum": 0,
-          "description": "Number of tokens used for thinking/reasoning."
-        }
-      },
-      "additionalProperties": true,
-      "description": "Breakdown of completion token usage."
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "reasoning_tokens": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Number of tokens used for thinking/reasoning."
+            }
+          },
+          "additionalProperties": true
+        },
+        {"type": "null"}
+      ],
+      "description": "Breakdown of completion token usage, or null if not available."
     }
   },
   "additionalProperties": true

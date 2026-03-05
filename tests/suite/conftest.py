@@ -1,55 +1,59 @@
-"""Suite-level fixtures: httpx client, common request helpers."""
+"""Suite-level fixtures: throttled httpx client, common request helpers."""
 
 from __future__ import annotations
 
+import os
 from typing import Any
 
 import httpx
 import pytest
 import pytest_asyncio
 
-from tests.conftest import ProviderConfig
+from tests.models import ModelConfig, NVIDIA_BASE_URL, NVIDIA_ENV_KEY
+from tests.suite.helpers.throttle import get_throttle
 
 
 @pytest_asyncio.fixture
-async def client(provider_config: ProviderConfig) -> httpx.AsyncClient:
+async def client() -> httpx.AsyncClient:
+    api_key = os.environ.get(NVIDIA_ENV_KEY, "")
+    if not api_key:
+        pytest.skip(f"Missing {NVIDIA_ENV_KEY} environment variable")
     async with httpx.AsyncClient(
-        base_url=provider_config.base_url,
+        base_url=NVIDIA_BASE_URL,
         headers={
-            "Authorization": f"Bearer {provider_config.api_key}",
+            "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json",
         },
-        timeout=httpx.Timeout(60.0, connect=10.0),
+        timeout=httpx.Timeout(120.0, connect=10.0),
     ) as c:
         yield c
 
 
 @pytest.fixture
-def chat_payload(provider_config: ProviderConfig) -> dict[str, Any]:
+def chat_payload(model_config: ModelConfig) -> dict[str, Any]:
     """Minimal chat completion payload."""
     return {
-        "model": provider_config.model,
+        "model": model_config.id,
         "messages": [{"role": "user", "content": "Say hi."}],
         "max_tokens": 10,
     }
 
 
 @pytest.fixture
-def thinking_payload(provider_config: ProviderConfig) -> dict[str, Any]:
-    """Chat payload with thinking enabled, using the thinking model."""
+def thinking_payload(model_config: ModelConfig) -> dict[str, Any]:
+    """Chat payload for thinking models — no thinking request param (Nvidia uses <think> tags inherently)."""
     return {
-        "model": provider_config.thinking_model,
+        "model": model_config.id,
         "messages": [{"role": "user", "content": "What is 2+2?"}],
         "max_tokens": 1024,
-        "thinking": {"enabled": True},
     }
 
 
 @pytest.fixture
-def stream_payload(provider_config: ProviderConfig) -> dict[str, Any]:
+def stream_payload(model_config: ModelConfig) -> dict[str, Any]:
     """Streaming chat completion payload."""
     return {
-        "model": provider_config.model,
+        "model": model_config.id,
         "messages": [{"role": "user", "content": "Say hi."}],
         "max_tokens": 30,
         "stream": True,
@@ -58,13 +62,12 @@ def stream_payload(provider_config: ProviderConfig) -> dict[str, Any]:
 
 
 @pytest.fixture
-def thinking_stream_payload(provider_config: ProviderConfig) -> dict[str, Any]:
-    """Streaming payload with thinking enabled."""
+def thinking_stream_payload(model_config: ModelConfig) -> dict[str, Any]:
+    """Streaming payload for thinking models — no thinking param."""
     return {
-        "model": provider_config.thinking_model,
+        "model": model_config.id,
         "messages": [{"role": "user", "content": "What is 2+2?"}],
         "max_tokens": 1024,
         "stream": True,
         "stream_options": {"include_usage": True},
-        "thinking": {"enabled": True},
     }

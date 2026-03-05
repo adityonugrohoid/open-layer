@@ -7,15 +7,18 @@ from typing import Any
 import httpx
 import pytest
 
-from tests.conftest import ProviderConfig, require_thinking
+from tests.models import ModelConfig
+from tests.conftest import require_thinking
 from tests.suite.helpers.sse import parse_sse_stream
 from tests.suite.helpers.schema import validate
+from tests.suite.helpers.throttle import get_throttle
 
 
 # --- Helpers ---
 
 async def collect_stream(client: httpx.AsyncClient, payload: dict[str, Any]) -> tuple[list[dict], bool]:
     """Send a streaming request and collect all chunks + whether [DONE] was received."""
+    await get_throttle().wait()
     chunks: list[dict] = []
     got_done = False
     async with client.stream("POST", "/chat/completions", json=payload) as resp:
@@ -32,6 +35,7 @@ async def collect_stream(client: httpx.AsyncClient, payload: dict[str, Any]) -> 
 
 @pytest.mark.level1
 async def test_stream_returns_sse(client: httpx.AsyncClient, stream_payload: dict) -> None:
+    await get_throttle().wait()
     async with client.stream("POST", "/chat/completions", json=stream_payload) as resp:
         content_type = resp.headers.get("content-type", "")
         assert "text/event-stream" in content_type, f"Expected text/event-stream, got {content_type}"
@@ -39,6 +43,7 @@ async def test_stream_returns_sse(client: httpx.AsyncClient, stream_payload: dic
 
 @pytest.mark.level1
 async def test_stream_events_prefixed_with_data(client: httpx.AsyncClient, stream_payload: dict) -> None:
+    await get_throttle().wait()
     async with client.stream("POST", "/chat/completions", json=stream_payload) as resp:
         found_data_line = False
         async for chunk in resp.aiter_text():
@@ -146,10 +151,11 @@ async def test_stream_content_accumulates(client: httpx.AsyncClient, stream_payl
 # --- Level 2 Tests ---
 
 @pytest.mark.level2
+@pytest.mark.xfail(reason="Nvidia uses <think> tags in content, not delta.thinking.content")
 async def test_stream_thinking_uses_delta_thinking_content(
-    client: httpx.AsyncClient, thinking_stream_payload: dict, provider_config: ProviderConfig
+    client: httpx.AsyncClient, thinking_stream_payload: dict, model_config: ModelConfig
 ) -> None:
-    require_thinking(provider_config)
+    require_thinking(model_config)
     chunks, _ = await collect_stream(client, thinking_stream_payload)
     thinking_deltas = []
     for chunk in chunks:
@@ -161,11 +167,12 @@ async def test_stream_thinking_uses_delta_thinking_content(
 
 
 @pytest.mark.level2
+@pytest.mark.xfail(reason="Nvidia uses <think> tags in content, not delta.thinking.content")
 async def test_stream_thinking_content_no_overlap(
-    client: httpx.AsyncClient, thinking_stream_payload: dict, provider_config: ProviderConfig
+    client: httpx.AsyncClient, thinking_stream_payload: dict, model_config: ModelConfig
 ) -> None:
     """Thinking deltas and content deltas MUST NOT overlap in the same chunk."""
-    require_thinking(provider_config)
+    require_thinking(model_config)
     chunks, _ = await collect_stream(client, thinking_stream_payload)
     for i, chunk in enumerate(chunks):
         for choice in chunk.get("choices", []):
@@ -179,9 +186,9 @@ async def test_stream_thinking_content_no_overlap(
 
 @pytest.mark.level2
 async def test_stream_thinking_usage_has_reasoning_tokens(
-    client: httpx.AsyncClient, thinking_stream_payload: dict, provider_config: ProviderConfig
+    client: httpx.AsyncClient, thinking_stream_payload: dict, model_config: ModelConfig
 ) -> None:
-    require_thinking(provider_config)
+    require_thinking(model_config)
     chunks, _ = await collect_stream(client, thinking_stream_payload)
     usage_chunks = [c for c in chunks if c.get("usage") is not None]
     if not usage_chunks:

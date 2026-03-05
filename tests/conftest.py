@@ -1,87 +1,106 @@
-"""Root conftest: CLI options, provider loading, and parameterization."""
+"""Root conftest: CLI options, model loading, and parameterization."""
 
 from __future__ import annotations
 
 import os
 from pathlib import Path
-from dataclasses import dataclass
 
 import pytest
-import tomli
 from dotenv import load_dotenv
 
+from tests.models import ModelConfig, MODELS, MODELS_BY_ID
 
 # Load .env from project root
 load_dotenv(Path(__file__).resolve().parent.parent / ".env")
 
-PROVIDERS_PATH = Path(__file__).resolve().parent / "providers.toml"
+# Default smoke subset for fast iteration (5 diverse models)
+SMOKE_MODELS: list[str] = [
+    "meta/llama-3.3-70b-instruct",
+    "google/gemma-3-27b-it",
+    "mistralai/mistral-small-3.1-24b-instruct-2503",
+    "deepseek-ai/deepseek-r1-distill-qwen-14b",
+    "microsoft/phi-4-mini-flash-reasoning",
+]
 
 
-@dataclass
-class ProviderConfig:
-    name: str
-    base_url: str
-    api_key: str
-    model: str
-    thinking_model: str
-    supports_thinking: bool
-    supports_budget: bool
+def _resolve_models(config: pytest.Config) -> list[ModelConfig]:
+    """Resolve CLI flags into a list of ModelConfig."""
+    model_filters: list[str] | None = config.getoption("model")
+    tag_filters: list[str] | None = config.getoption("tag")
+    use_all: bool = config.getoption("all_models")
 
+    if use_all:
+        return list(MODELS)
 
-def load_providers(names: list[str] | None = None) -> list[ProviderConfig]:
-    with open(PROVIDERS_PATH, "rb") as f:
-        data = tomli.load(f)
+    if model_filters:
+        result = []
+        for filt in model_filters:
+            matches = [m for m in MODELS if filt in m.id]
+            if not matches:
+                pytest.exit(f"No models matching --model {filt!r}", returncode=1)
+            result.extend(matches)
+        # Deduplicate while preserving order
+        seen: set[str] = set()
+        deduped = []
+        for m in result:
+            if m.id not in seen:
+                seen.add(m.id)
+                deduped.append(m)
+        return deduped
 
-    providers = []
-    for name, cfg in data.items():
-        if names and name not in names:
-            continue
-        api_key = os.environ.get(cfg["env_key"], "")
-        if not api_key:
-            continue
-        providers.append(
-            ProviderConfig(
-                name=name,
-                base_url=cfg["base_url"].rstrip("/"),
-                api_key=api_key,
-                model=cfg["model"],
-                thinking_model=cfg.get("thinking_model", ""),
-                supports_thinking=cfg.get("supports_thinking", False),
-                supports_budget=cfg.get("supports_budget", False),
-            )
-        )
-    return providers
+    if tag_filters:
+        result = []
+        for m in MODELS:
+            if any(tag in m.tags for tag in tag_filters):
+                result.append(m)
+        if not result:
+            pytest.exit(f"No models matching --tag {tag_filters}", returncode=1)
+        return result
+
+    # Default: smoke subset
+    return [MODELS_BY_ID[mid] for mid in SMOKE_MODELS if mid in MODELS_BY_ID]
 
 
 def pytest_addoption(parser: pytest.Parser) -> None:
     parser.addoption(
-        "--provider",
+        "--model",
         action="append",
         default=None,
-        help="Provider name(s) to test (can be repeated). Default: all with keys.",
+        help="Model ID substring filter (can be repeated). Default: smoke subset.",
+    )
+    parser.addoption(
+        "--tag",
+        action="append",
+        default=None,
+        help="Tag filter (can be repeated, e.g. --tag thinking). Default: smoke subset.",
+    )
+    parser.addoption(
+        "--all",
+        action="store_true",
+        default=False,
+        dest="all_models",
+        help="Run against all 52 models.",
     )
 
 
 def pytest_generate_tests(metafunc: pytest.Metafunc) -> None:
-    if "provider_config" in metafunc.fixturenames:
-        names = metafunc.config.getoption("provider")
-        providers = load_providers(names)
-        if not providers:
-            pytest.skip("No providers available (missing API keys or --provider filter)")
+    if "model_config" in metafunc.fixturenames:
+        models = _resolve_models(metafunc.config)
+        if not models:
+            pytest.skip("No models available")
         metafunc.parametrize(
-            "provider_config",
-            providers,
-            ids=[p.name for p in providers],
+            "model_config",
+            models,
+            ids=[m.short_id for m in models],
         )
 
 
-def require_thinking(provider_config: ProviderConfig) -> None:
-    """Skip the test if the provider doesn't support thinking."""
-    if not provider_config.supports_thinking or not provider_config.thinking_model:
-        pytest.skip(f"{provider_config.name} does not support thinking")
+def require_thinking(model_config: ModelConfig) -> None:
+    """Skip the test if the model is not a thinking model."""
+    if not model_config.is_thinking:
+        pytest.skip(f"{model_config.short_id} is not a thinking model")
 
 
-def require_budget(provider_config: ProviderConfig) -> None:
-    """Skip the test if the provider doesn't support budget control."""
-    if not provider_config.supports_budget:
-        pytest.skip(f"{provider_config.name} does not support budget_tokens")
+def require_budget(model_config: ModelConfig) -> None:
+    """Skip the test — Nvidia has no budget control."""
+    pytest.skip("Nvidia NIM does not support budget_tokens")

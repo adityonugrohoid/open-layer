@@ -6,6 +6,7 @@ import httpx
 import pytest
 
 from tests.suite.helpers.schema import validate
+from tests.suite.helpers.throttle import get_throttle
 
 pytestmark = pytest.mark.level1
 
@@ -13,6 +14,7 @@ pytestmark = pytest.mark.level1
 # --- Helpers ---
 
 async def get_capabilities(client: httpx.AsyncClient) -> dict | None:
+    await get_throttle().wait()
     resp = await client.get("/capabilities")
     if resp.status_code == 404:
         return None
@@ -20,9 +22,10 @@ async def get_capabilities(client: httpx.AsyncClient) -> dict | None:
     return resp.json()
 
 
-# --- Tests ---
+# --- Tests (run once, not per-model) ---
 
 async def test_capabilities_endpoint_exists(client: httpx.AsyncClient) -> None:
+    await get_throttle().wait()
     resp = await client.get("/capabilities")
     if resp.status_code == 404:
         pytest.skip("Capabilities endpoint not implemented (404)")

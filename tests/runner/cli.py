@@ -1,10 +1,11 @@
 """Thin CLI wrapper around pytest for running conformance tests.
 
 Usage:
-    python -m tests.runner.cli                         # All providers, all tests
-    python -m tests.runner.cli --provider groq         # Single provider
-    python -m tests.runner.cli -m level1               # Only Level 1
-    python -m tests.runner.cli --provider deepseek -m level2  # L2 against DeepSeek
+    python -m tests.runner.cli                         # Smoke subset (5 models)
+    python -m tests.runner.cli --all                   # All 52 models
+    python -m tests.runner.cli --model llama-3.3-70b   # Single model (substring)
+    python -m tests.runner.cli --tag thinking           # Thinking models only
+    python -m tests.runner.cli -m level1               # Only Level 1 tests
 """
 
 from __future__ import annotations
