@@ -198,21 +198,21 @@ See [Errors](errors.md) for the full error schema.
 
 ### Streaming Delta Fields
 
-| Standard | Groq | DeepSeek | Qwen | Mistral |
+| Standard | Groq | DeepSeek | Nvidia | Mistral |
 |----------|------|----------|------|---------|
 | `delta.content` | `delta.content` | `delta.content` | `delta.content` | `delta.content` (string) or `delta.content[]` (blocks) |
 | `delta.thinking.content` | `delta.reasoning` | `delta.reasoning_content` | `delta.reasoning_content` | `delta.content[].thinking[].text` |
 
 ### Usage in Streaming
 
-| Standard | Groq | DeepSeek | Qwen | Mistral |
+| Standard | Groq | DeepSeek | Nvidia | Mistral |
 |----------|------|----------|------|---------|
 | `stream_options.include_usage: true` | ✅ | ✅ | ✅ | Automatic (always included) |
-| Usage in separate final chunk | ✅ | ✅ | ✅ (empty choices) | In chunk with `finish_reason` |
+| Usage in separate final chunk | ✅ | ✅ | ✅ | In chunk with `finish_reason` |
 
 ### Adapter Notes
 
 - **Mistral:** For non-reasoning models, `delta.content` is a string (no translation needed). For Magistral (reasoning) models, `delta.content` is an array of typed blocks. Adapters MUST flatten these blocks into `delta.content` (string) and `delta.thinking.content` (string).
 - **Mistral:** Usage is automatic — adapters SHOULD still accept `stream_options.include_usage` but MAY ignore it since Mistral always includes usage.
-- **Qwen:** Sends explicit `null` for inactive fields (e.g. `"reasoning_content": null` during content phase). Adapters SHOULD strip these `null` values.
+- **Nvidia:** Uses `reasoning_content` in deltas (same field name as DeepSeek). R1-distill models may embed thinking in `<think>` tags within `content` — adapters MUST parse and separate these.
 - **DeepSeek:** Reasoning and content phases never overlap — matches the Open Layer spec naturally.

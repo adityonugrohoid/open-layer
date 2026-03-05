@@ -11,7 +11,7 @@
 - [x] Error contract spec
 - [ ] Conformance test suite (CLI runner)
 - [ ] Python reference SDK
-- [ ] Adapters: Groq, DeepSeek, Alibaba Qwen
+- [ ] Adapters: Groq, DeepSeek, Nvidia
 
 ## v0.2 — Agentic
 - [ ] Tool calling spec

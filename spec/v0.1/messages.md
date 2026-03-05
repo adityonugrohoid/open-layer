@@ -156,7 +156,7 @@ Providers MUST return one of the above values. Provider-specific finish reasons 
 
 All four target providers accept the standard request format with no translation needed:
 
-| Parameter | Groq | DeepSeek | Qwen | Mistral |
+| Parameter | Groq | DeepSeek | Nvidia | Mistral |
 |-----------|------|----------|------|---------|
 | `model` | ✅ | ✅ | ✅ | ✅ |
 | `messages` | ✅ | ✅ | ✅ | ✅ |
@@ -166,9 +166,11 @@ All four target providers accept the standard request format with no translation
 | `stop` | ✅ | ✅ | ✅ | ✅ |
 | `stream` | ✅ | ✅ | ✅ | ✅ |
 
+Note: The four target providers are **Groq**, **DeepSeek**, **Nvidia** (NIM API), and **Mistral**.
+
 ### Response Fields
 
-| Field | Groq | DeepSeek | Qwen | Mistral |
+| Field | Groq | DeepSeek | Nvidia | Mistral |
 |-------|------|----------|------|---------|
 | `id` | ✅ | ✅ | ✅ | ✅ |
 | `object` | ✅ | ✅ | ✅ | ✅ |
@@ -178,13 +180,15 @@ All four target providers accept the standard request format with no translation
 | `usage` | ✅ | ✅ | ✅ | ✅ |
 | `finish_reason` | `stop`, `length`, `tool_calls` | `stop`, `length`, `tool_calls`, `insufficient_system_resource` | `stop`, `length`, `tool_calls` | `stop`, `length`, `tool_calls` |
 
+Note: Nvidia includes `reasoning` and `reasoning_content` fields on all messages (set to `null` for non-reasoning models). Adapters SHOULD strip these `null` fields.
+
 ### Provider-Specific Extensions
 
 | Provider | Extra Fields | Handling |
 |----------|-------------|----------|
 | Groq | `x_groq` (internal request ID), `system_fingerprint` | Pass through as-is |
 | DeepSeek | `system_fingerprint` | Pass through as-is |
-| Qwen | — | — |
+| Nvidia | `reasoning`, `reasoning_content`, `refusal`, `annotations` (all null for non-reasoning), `metadata` | Strip null fields |
 | Mistral | — | — |
 
 ## Examples
@@ -274,7 +278,7 @@ All four target providers accept the standard request format with no translation
 **Request:**
 ```json
 {
-  "model": "qwen-turbo",
+  "model": "meta/llama-3.3-70b-instruct",
   "messages": [
     {"role": "user", "content": "Write a long essay about the history of computing."}
   ],
@@ -288,7 +292,7 @@ All four target providers accept the standard request format with no translation
   "id": "chatcmpl-ghi789",
   "object": "chat.completion",
   "created": 1709000200,
-  "model": "qwen-turbo",
+  "model": "meta/llama-3.3-70b-instruct",
   "choices": [
     {
       "index": 0,

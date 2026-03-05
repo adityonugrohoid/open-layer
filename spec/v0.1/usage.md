@@ -84,7 +84,7 @@ The `usage` object appears in every non-streaming response and in the final stre
 
 All four providers return the standard three fields with no translation needed:
 
-| Standard | Groq | DeepSeek | Qwen | Mistral |
+| Standard | Groq | DeepSeek | Nvidia | Mistral |
 |----------|------|----------|------|---------|
 | `prompt_tokens` | ✅ | ✅ | ✅ | ✅ |
 | `completion_tokens` | ✅ | ✅ | ✅ | ✅ |
@@ -92,21 +92,21 @@ All four providers return the standard three fields with no translation needed:
 
 ### Reasoning Token Breakdown
 
-| Standard | Groq | DeepSeek | Qwen | Mistral |
+| Standard | Groq | DeepSeek | Nvidia | Mistral |
 |----------|------|----------|------|---------|
-| `completion_tokens_details.reasoning_tokens` | Not reported (set to `0`) | `completion_tokens_details.reasoning_tokens` | `completion_tokens_details.reasoning_tokens` | Not reported (set to `0`) |
+| `completion_tokens_details.reasoning_tokens` | Not reported (set to `0`) | `completion_tokens_details.reasoning_tokens` | `usage.reasoning_tokens` (top-level, not nested) | Not reported (set to `0`) |
 
 ### Cache Reporting
 
-| Standard | Groq | DeepSeek | Qwen | Mistral |
+| Standard | Groq | DeepSeek | Nvidia | Mistral |
 |----------|------|----------|------|---------|
-| `prompt_tokens_details.cached_tokens` | Not reported | `prompt_cache_hit_tokens` (top-level) | `prompt_tokens_details.cached_tokens` | Not reported |
+| `prompt_tokens_details.cached_tokens` | Not reported | `prompt_cache_hit_tokens` (top-level) | `prompt_tokens_details` (null when no cache data) | Not reported |
 
 ### Adapter Notes
 
 - **Groq:** Includes unique timing fields (`queue_time`, `prompt_time`, `completion_time`, `total_time`). Adapters SHOULD pass these through as provider-specific extensions but MUST NOT rely on them in the standard usage object. Reasoning tokens are reported only in the Responses API (`output_tokens_details.reasoning_tokens`), not in chat completions.
 - **DeepSeek:** Reports cache at the top level (`prompt_cache_hit_tokens`, `prompt_cache_miss_tokens`) rather than nested in `prompt_tokens_details`. Adapters MUST map `prompt_cache_hit_tokens` → `prompt_tokens_details.cached_tokens`.
-- **Qwen:** The most granular reporting — includes per-modality breakdowns (`text_tokens`, `image_tokens`, `video_tokens`, `audio_tokens`). Adapters MAY pass these through in `prompt_tokens_details` and `completion_tokens_details` as additional fields but MUST include the standard `cached_tokens` and `reasoning_tokens` fields.
+- **Nvidia:** Reports `reasoning_tokens` at the top level of the `usage` object (not nested in `completion_tokens_details`). Adapters MUST move this into `completion_tokens_details.reasoning_tokens`. `prompt_tokens_details` is returned as `null` when no cache data is available — adapters SHOULD omit it rather than passing `null`.
 - **Mistral:** The simplest reporting — no reasoning breakdown, no cache reporting. Adapters MUST set `reasoning_tokens: 0` when thinking is enabled and omit `prompt_tokens_details` when cache data is not available.
 
 ### Provider Extension Fields
@@ -117,8 +117,7 @@ Providers MAY include additional fields beyond the standard ones. Adapters SHOUL
 |----------|-------------|------|
 | Groq | `queue_time`, `prompt_time`, `completion_time`, `total_time` | Timing (seconds) |
 | DeepSeek | `prompt_cache_hit_tokens`, `prompt_cache_miss_tokens` | Token counts |
-| Qwen | `prompt_tokens_details.text_tokens`, `.image_tokens`, `.video_tokens`, `.audio_tokens` | Token counts |
-| Qwen | `completion_tokens_details.text_tokens`, `.audio_tokens` | Token counts |
+| Nvidia | `reasoning_tokens` (top-level), `metadata` | Token count, metadata object |
 
 ## Examples
 
