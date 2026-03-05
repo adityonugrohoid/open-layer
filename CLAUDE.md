@@ -5,95 +5,74 @@ Open Layer is a universal open standard (specification) for LLM inference I/O �
 
 ## Tech Stack
 - **Spec:** Markdown + JSON Schema draft-2020-12 (versioned in git)
-- **Conformance tests:** Python (pytest)
-- **Reference SDK:** Python (PyPI: `open-layer`)
-- **Adapters:** Python (FastAPI/Starlette thin proxy)
-- **Docs site:** MkDocs or Docusaurus (GitHub Pages)
-- **CI:** GitHub Actions
-
-## Architecture
-```
-[Application] → Open Layer SDK → [Conformant Provider API]
-                                   ├── Groq
-                                   ├── DeepSeek
-                                   ├── Nvidia (NIM)
-                                   ├── Mistral
-                                   └── Cerebras
-```
-No central proxy. The spec IS the interop layer. Providers conform natively.
-Adapters exist as temporary bootstrap shims until native adoption.
+- **Conformance tests:** Python (pytest, pytest-asyncio, httpx)
+- **Reference SDK:** Python async (httpx, dataclasses)
+- **Adapters:** Python (Nvidia, DeepSeek, Groq)
 
 ## Project Structure
 ```
 open-layer/
-├── spec/v0.1/          # The specification (Markdown + JSON Schema)
-│   ├── messages.md     # Core request/response, roles, finish reasons
-│   ├── thinking.md     # Thinking tokens: enable, budget, response, multi-turn
-│   ├── streaming.md    # SSE format, delta shapes, phase sequencing
-│   ├── usage.md        # Token counting, reasoning breakdown, cache reporting
-│   ├── capabilities.md # GET /v1/capabilities discovery endpoint
-│   ├── errors.md       # Error types, HTTP codes, rate limits, stream errors
-│   └── schema/         # 8 JSON Schema files (draft-2020-12)
-├── tests/              # Conformance test suite
-├── sdks/python/        # Reference SDK
-├── adapters/           # Provider adapter shims
-│   ├── groq/
-│   ├── deepseek/
-│   └── nvidia/
+├── spec/v0.1/              # Specification (6 sections + 8 JSON schemas)
+├── tests/                   # Conformance test suite
+│   ├── models.py            #   30-model registry (ModelConfig dataclass)
+│   ├── conftest.py          #   CLI: --model/--tag/--all parameterization
+│   ├── suite/               #   66 tests per model (6 test files)
+│   │   ├── helpers/
+│   │   │   ├── throttle.py  #   35 RPM asyncio.Lock throttle
+│   │   │   ├── schema.py    #   JSON Schema validator
+│   │   │   └── sse.py       #   SSE stream parser
+│   │   └── test_*.py        #   messages, streaming, usage, thinking, capabilities, errors
+│   ├── results/             #   Saved conformance outputs
+│   └── runner/cli.py        #   pytest wrapper
+├── sdks/python/open_layer/  # Python SDK
+│   ├── client.py            #   Async client (chat + stream)
+│   ├── types.py             #   Typed dataclasses for all spec types
+│   └── adapter.py           #   Adapter protocol
+├── adapters/                # Provider adapters
+│   ├── nvidia/              #   <think> tag extraction, usage normalization
+│   ├── deepseek/            #   reasoning_content mapping, input stripping
+│   └── groq/                #   reasoning field mapping, budget→effort
+├── scripts/
+│   └── validate_sdk.py      #   SDK+adapter validation against 12 models
 └── docs/
-    └── provider-fragmentation.md  # Provider research (source of truth)
+    └── provider-fragmentation.md
 ```
 
-## v0.1 Status
-- [x] Spec: all 6 sections + 8 JSON schemas (Draft)
-- [ ] Conformance test suite (pytest CLI runner)
-- [ ] Python reference SDK
-- [ ] Adapters: Groq, DeepSeek, Nvidia (NIM)
-
-## Key Spec Decisions
-- **Thinking request:** `thinking.enabled` (bool) + `thinking.budget_tokens` (int, optional)
-- **Thinking response:** `message.thinking.content` (always a string, never array)
-- **Streaming thinking:** `delta.thinking.content` — phases MUST NOT overlap
-- **Usage:** `completion_tokens_details.reasoning_tokens` + `prompt_tokens_details.cached_tokens`
-- **Capabilities:** `GET /v1/capabilities` — new endpoint, synthesized by adapters
-- **Errors:** 7 standard types, `retry-after` REQUIRED on 429
-- **Conformance levels:** L1 Core, L2 Thinking, L3 Agentic (deferred to v0.2)
-- **Versioning:** `0.1-draft` for now, date-based (YYYY-MM-DD) at 1.0
-
-## Provider Mapping (quick ref)
-| Feature | Groq | DeepSeek | Nvidia | Mistral |
-|---------|------|----------|--------|---------|
-| Thinking field | `reasoning` | `reasoning_content` | `reasoning_content` (or `<think>` tags for R1-distill) | typed content blocks |
-| Budget param | `reasoning_effort` | N/A (max_tokens) | N/A | N/A |
-| Cache reporting | — | `prompt_cache_hit_tokens` (top-level) | `prompt_tokens_details` (null when N/A) | — |
-| Reasoning usage | — | `completion_tokens_details.reasoning_tokens` | `usage.reasoning_tokens` (top-level) | — |
-| Input thinking | OK | MUST strip (400 error) | OK | OK |
-
-## Key Patterns
-- Spec-first development: spec → tests → SDK → adapters
-- Adapters are temporary — goal is native provider adoption
-- JSON Schema for request/response validation
-- Provider-specific fields allowed with `x-` prefix
-- RFC 2119 language in spec (MUST/SHOULD/MAY)
+## v0.1 Status — PoC COMPLETE
+- [x] Spec: 6 sections + 8 JSON schemas (Draft)
+- [x] Conformance tests: 66 tests/model, 30-model registry, CLI filters
+- [x] Python SDK: async client, typed dataclasses, adapter protocol
+- [x] Adapters: Nvidia, DeepSeek, Groq
+- [x] Conformance results: 12 models, 10 families tested
 
 ## Commands
 ```bash
-# All commands run from ~/projects/open-layer/
+# All commands from ~/projects/open-layer/
+source .venv/bin/activate
 
-# Run conformance tests (once implemented)
-cd tests && python -m pytest suite/ -v
+# Conformance tests
+cd tests && python -m pytest suite/ -v                    # smoke (5 models)
+cd tests && python -m pytest suite/ -v --model llama-3.3  # single model
+cd tests && python -m pytest suite/ -v --tag thinking     # thinking models
+cd tests && python -m pytest suite/ -v --all              # all 30 models
 
-# Validate a provider
-python -m open_layer validate --provider <url> --key <key>
+# SDK validation
+python scripts/validate_sdk.py
 
 # Validate JSON schemas
 python3 -c "import json, glob; [print(f'OK: {f}') for f in sorted(glob.glob('spec/v0.1/schema/*.json')) if json.load(open(f))]"
 ```
 
-## Important Notes
-- This is a SPEC project, not a service or library
-- Target open model providers first (Groq, DeepSeek, Nvidia, Mistral)
-- Frontier models (OpenAI, Anthropic) welcome but not required
-- Apache 2.0 licensed
-- Concept doc: ~/projects/brainstorming/concepts/open-layer.md
-- Provider research: docs/provider-fragmentation.md (single source of truth for mappings)
+## Key Conformance Findings
+- 4/12 models reject unknown fields (Nvidia gateway, not model-level)
+- 5/12 models include non-empty choices in streaming usage chunk
+- Thinking models use `<think>` tags, not `message.thinking.content`
+- Nvidia returns plain text (not JSON) for invalid model errors
+- SDK+adapter: 12/12 models PASS after adapter normalization
+
+## Key Patterns
+- Spec-first: spec → tests → SDK → adapters
+- Adapters are temporary — goal is native provider adoption
+- 35 RPM throttle for Nvidia free tier (asyncio.Lock in throttle.py)
+- xfail for known provider deviations (tests stay spec-correct)
+- ModelConfig with tag-based parameterization (not provider-based)
